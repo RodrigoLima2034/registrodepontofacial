@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ponto Facial Pro</title>
+
+<!-- Tailwind (Play CDN) -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Fontes -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          canvasbg: '#0A0B0D',
+          panel: '#14171B',
+          panelBorder: '#262B31',
+          accent: '#F5A623',
+          accentDim: '#8A5A16',
+        },
+        fontFamily: {
+          sans: ['Inter', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'monospace'],
+        },
+      },
+    },
+  };
+</script>
+
+<style>
+  body { font-family: 'Inter', sans-serif; }
+
+  .flash {
+    animation: flashPulse 320ms ease-out;
+  }
+  @keyframes flashPulse {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  .scan-active {
+    animation: scanSweep 1.6s ease-in-out infinite;
+  }
+  @keyframes scanSweep {
+    0%   { top: 6%;  opacity: 0; }
+    10%  { opacity: 1; }
+    50%  { top: 94%; opacity: 1; }
+    90%  { opacity: 1; }
+    100% { top: 6%;  opacity: 0; }
+  }
+
+  #log-panel::-webkit-scrollbar { width: 6px; }
+  #log-panel::-webkit-scrollbar-thumb { background: #262B31; border-radius: 4px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scan-active { animation: none; opacity: .6; top: 50%; }
+    .flash { animation: none; }
+  }
+</style>
+</head>
+
+<body class="bg-canvasbg text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="border-b border-panelBorder bg-canvasbg/80 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-md mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-2.5">
+        <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
+        <span class="font-mono font-bold text-sm tracking-[0.2em] text-slate-200">PONTO FACIAL</span>
+      </div>
+      <div id="clock" class="font-mono text-sm text-slate-500 tracking-widest">00:00:00</div>
+    </div>
+  </header>
+
+  <!-- Conteúdo principal -->
+  <main class="max-w-md mx-auto w-full px-4 py-8 flex-grow flex flex-col justify-center">
+    <div class="bg-panel border border-panelBorder rounded-2xl p-5 shadow-2xl">
+
+      <!-- Rótulo de estado do sistema -->
+      <div class="flex items-center justify-between mb-4 px-1">
+        <span class="font-mono text-[11px] tracking-[0.15em] text-slate-500">TERMINAL 01</span>
+        <span id="camera-pill" class="font-mono text-[11px] tracking-[0.1em] px-2 py-0.5 rounded border border-panelBorder text-slate-500">
+          CÂMERA: AGUARDANDO
+        </span>
+      </div>
+
+      <!-- Visor da câmera -->
+      <div class="relative aspect-[4/3] w-full bg-black rounded-xl overflow-hidden border border-panelBorder">
+        <video id="video" autoplay playsinline muted class="w-full h-full object-cover scale-x-[-1]"></video>
+        <canvas id="canvas" class="hidden"></canvas>
+
+        <!-- Overlay de flash na captura -->
+        <div id="flash-overlay" class="absolute inset-0 bg-white opacity-0 pointer-events-none"></div>
+
+        <!-- Cantos de mira, estilo scanner de segurança -->
+        <div class="absolute inset-5 pointer-events-none">
+          <div class="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-accent/70"></div>
+          <div class="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-accent/70"></div>
+          <div class="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-accent/70"></div>
+          <div class="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-accent/70"></div>
+          <div id="scan-line" class="absolute left-[8%] right-[8%] h-px bg-accent shadow-[0_0_10px_2px_rgba(245,166,35,0.55)] opacity-0"></div>
+        </div>
+
+        <!-- Mensagem quando a câmera não está disponível -->
+        <div id="camera-fallback" class="hidden absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/90 text-center px-6">
+          <p class="text-sm text-slate-400">Não foi possível acessar a câmera.</p>
+          <button id="btn-retry-camera" class="font-mono text-xs tracking-wide px-3 py-1.5 rounded border border-panelBorder text-slate-300 hover:border-accent hover:text-accent transition-colors">
+            TENTAR NOVAMENTE
+          </button>
+        </div>
+      </div>
+
+      <!-- Instruções -->
+      <div class="text-center mt-5 mb-5">
+        <h2 class="text-lg font-semibold tracking-tight">Registro de presença</h2>
+        <p class="text-slate-500 text-sm mt-1">Posicione o rosto dentro da moldura, em um ambiente bem iluminado.</p>
+      </div>
+
+      <!-- Botão de ação -->
+      <button id="btn-capture" disabled
+        class="w-full py-4 bg-accent disabled:bg-panelBorder disabled:text-slate-500 disabled:cursor-not-allowed
+               hover:bg-amber-400 text-slate-950 font-bold rounded-xl transition-colors duration-200
+               active:scale-[0.98] flex items-center justify-center gap-2 text-base tracking-wide
+               focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-panel">
+        <span id="btn-capture-label">CONECTANDO CÂMERA…</span>
+      </button>
+
+      <!-- Painel de status -->
+      <div id="status-box" class="mt-4 p-3.5 rounded-lg hidden text-sm font-medium transition-colors duration-200 flex items-center gap-2.5">
+        <span id="status-icon" class="w-1.5 h-1.5 rounded-full shrink-0"></span>
+        <span id="status-text">Processando biometria…</span>
+      </div>
+
+      <!-- Registro de eventos, estilo console -->
+      <div class="mt-4">
+        <div class="flex items-center justify-between mb-1.5 px-0.5">
+          <span class="font-mono text-[10px] tracking-[0.15em] text-slate-600">REGISTRO DE EVENTOS</span>
+        </div>
+        <div id="log-panel" aria-live="polite" class="font-mono text-[11px] leading-relaxed text-slate-500 bg-black/40 border border-panelBorder rounded-lg px-3 py-2.5 h-24 overflow-y-auto space-y-0.5">
+          <div class="text-slate-600">— aguardando inicialização —</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-center py-4 text-xs text-slate-600 border-t border-panelBorder/60">
+    © 2026 Sistema Integrado de Recursos Humanos
+  </footer>
+
+  <script>
+    // ————————————————————————————————————————————
+    // Configuração
+    // ————————————————————————————————————————————
+    const APP_CONFIG = {
+      // Substitua pela URL real do seu API Gateway (AWS), por exemplo:
+      // "https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/reconhecimento"
+      apiEndpoint: "https://SUA_API_GATEWAY_AQUI.execute-api.REGIAO.amazonaws.com/prod/reconhecimento",
+      requestTimeoutMs: 15000,
+    };
+
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const btnCapture = document.getElementById('btn-capture');
+    const btnCaptureLabel = document.getElementById('btn-capture-label');
+    const btnRetryCamera = document.getElementById('btn-retry-camera');
+    const cameraFallback = document.getElementById('camera-fallback');
+    const cameraPill = document.getElementById('camera-pill');
+    const statusDot = document.getElementById('status-dot');
+    const statusBox = document.getElementById('status-box');
+    const statusIcon = document.getElementById('status-icon');
+    const statusText = document.getElementById('status-text');
+    const flashOverlay = document.getElementById('flash-overlay');
+    const scanLine = document.getElementById('scan-line');
+    const logPanel = document.getElementById('log-panel');
+
+    let cameraStream = null;
+
+    // ————————————————————————————————————————————
+    // Relógio digital
+    // ————————————————————————————————————————————
+    function tickClock() {
+      document.getElementById('clock').innerText = new Date().toLocaleTimeString('pt-BR');
+    }
+    tickClock();
+    setInterval(tickClock, 1000);
+
+    // ————————————————————————————————————————————
+    // Registro de eventos (console visual)
+    // ————————————————————————————————————————————
+    const LOG_COLORS = {
+      info: 'text-slate-400',
+      success: 'text-emerald-400',
+      error: 'text-rose-400',
+    };
+    function logEvent(message, type = 'info') {
+      if (logPanel.firstElementChild?.dataset?.placeholder) logPanel.innerHTML = '';
+      const time = new Date().toLocaleTimeString('pt-BR');
+      const line = document.createElement('div');
+      line.className = LOG_COLORS[type] || LOG_COLORS.info;
+      line.textContent = `[${time}] ${message}`;
+      logPanel.appendChild(line);
+      logPanel.scrollTop = logPanel.scrollHeight;
+    }
+
+    // ————————————————————————————————————————————
+    // Status visual (caixa abaixo do botão)
+    // ————————————————————————————————————————————
+    function showStatus(text, type) {
+      const styles = {
+        loading: { box: 'bg-slate-700/30 text-slate-300', dot: 'bg-slate-400 animate-pulse' },
+        success: { box: 'bg-emerald-500/10 text-emerald-400', dot: 'bg-emerald-400' },
+        error:   { box: 'bg-rose-500/10 text-rose-400',       dot: 'bg-rose-400' },
+      };
+      const s = styles[type] || styles.loading;
+      statusBox.className = `mt-4 p-3.5 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2.5 ${s.box}`;
+      statusIcon.className = `w-1.5 h-1.5 rounded-full shrink-0 ${s.dot}`;
+      statusText.innerText = text;
+      statusBox.classList.remove('hidden');
+    }
+
+    // ————————————————————————————————————————————
+    // Câmera
+    // ————————————————————————————————————————————
+    function setCameraPill(label, tone) {
+      const tones = {
+        neutral: 'text-slate-500 border-panelBorder',
+        active: 'text-emerald-400 border-emerald-500/30',
+        error: 'text-rose-400 border-rose-500/30',
+      };
+      cameraPill.className = `font-mono text-[11px] tracking-[0.1em] px-2 py-0.5 rounded border ${tones[tone] || tones.neutral}`;
+      cameraPill.innerText = `CÂMERA: ${label}`;
+    }
+
+    async function initCamera() {
+      cameraFallback.classList.add('hidden');
+      setCameraPill('CONECTANDO', 'neutral');
+      statusDot.className = 'w-2.5 h-2.5 rounded-full bg-slate-500 animate-pulse';
+
+      if (!navigator.mediaDevices?.getUserMedia) {
+        handleCameraError('Este navegador não suporta acesso à câmera.');
+        return;
+      }
+
+      try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user', width: { ideal: 720 }, height: { ideal: 540 } },
+          audio: false,
+        });
+        video.srcObject = cameraStream;
+        await video.play();
+
+        setCameraPill('ATIVA', 'active');
+        statusDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400';
+        btnCapture.disabled = false;
+        btnCaptureLabel.innerText = 'REGISTRAR PONTO';
+        logEvent('Câmera conectada com sucesso.', 'success');
+      } catch (err) {
+        const message = err?.name === 'NotAllowedError'
+          ? 'Permissão de câmera negada pelo usuário.'
+          : 'Não foi possível acessar a câmera.';
+        handleCameraError(message);
+      }
+    }
+
+    function handleCameraError(message) {
+      setCameraPill('INDISPONÍVEL', 'error');
+      statusDot.className = 'w-2.5 h-2.5 rounded-full bg-rose-500';
+      btnCapture.disabled = true;
+      btnCaptureLabel.innerText = 'CÂMERA INDISPONÍVEL';
+      cameraFallback.classList.remove('hidden');
+      logEvent(message, 'error');
+    }
+
+    btnRetryCamera.addEventListener('click', initCamera);
+
+    // ————————————————————————————————————————————
+    // Captura e envio para a API (AWS)
+    // ————————————————————————————————————————————
+    function triggerFlash() {
+      flashOverlay.classList.remove('flash');
+      void flashOverlay.offsetWidth; // reinicia a animação
+      flashOverlay.classList.add('flash');
+    }
+
+    function setScanning(active) {
+      scanLine.classList.toggle('opacity-100', active);
+      scanLine.classList.toggle('scan-active', active);
+    }
+
+    btnCapture.addEventListener('click', async () => {
+      if (!cameraStream) return;
+
+      // Aviso amigável se o endpoint ainda não foi configurado
+      if (APP_CONFIG.apiEndpoint.includes('SUA_API_GATEWAY_AQUI')) {
+        showStatus('Endpoint da AWS ainda não configurado no código.', 'error');
+        logEvent('Configuração pendente: defina APP_CONFIG.apiEndpoint.', 'error');
+        return;
+      }
+
+      triggerFlash();
+      setScanning(true);
+      showStatus('Analisando seu rosto no servidor…', 'loading');
+      logEvent('Captura iniciada, enviando para reconhecimento.', 'info');
+      btnCapture.disabled = true;
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+      const base64Image = canvas.toDataURL('image/jpeg', 0.92).replace(/^data:image\/jpeg;base64,/, '');
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), APP_CONFIG.requestTimeoutMs);
+
+      try {
+        const response = await fetch(APP_CONFIG.apiEndpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image_base64: base64Image,
+            timestamp: new Date().toISOString(),
+          }),
+          signal: controller.signal,
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (response.ok) {
+          const id = data.funcionario_id ?? 'desconhecido';
+          showStatus(`Ponto registrado — funcionário ${id}`, 'success');
+          logEvent(`Sucesso: ponto registrado (ID ${id}).`, 'success');
+        } else {
+          const msg = data.mensagem || 'Rosto não reconhecido.';
+          showStatus(`Acesso negado: ${msg}`, 'error');
+          logEvent(`Falha: ${msg} (HTTP ${response.status}).`, 'error');
+        }
+      } catch (error) {
+        const msg = error.name === 'AbortError'
+          ? 'Tempo de resposta esgotado. Tente novamente.'
+          : 'Erro de comunicação com o servidor.';
+        showStatus(msg, 'error');
+        logEvent(msg, 'error');
+      } finally {
+        clearTimeout(timeout);
+        setScanning(false);
+        btnCapture.disabled = false;
+      }
+    });
+
+    window.addEventListener('load', initCamera);
+    window.addEventListener('beforeunload', () => {
+      cameraStream?.getTracks().forEach(track => track.stop());
+    });
+  </script>
+</body>
+</html>
