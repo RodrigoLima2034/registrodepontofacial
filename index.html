@@ -4,12 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ponto Biométrico - Versão Estável</title>
+    <title>Ponto Biométrico - Versão Final</title>
 
     <style>
-        /* ============================================
-           RESET E VARIÁVEIS
-           ============================================ */
         * {
             margin: 0;
             padding: 0;
@@ -47,9 +44,6 @@
             background-image: radial-gradient(ellipse at 50% 0%, #1a1a2e 0%, #0a0a12 70%);
         }
 
-        /* ============================================
-           CONTAINER
-           ============================================ */
         .container {
             max-width: 540px;
             width: 100%;
@@ -60,9 +54,7 @@
             box-shadow: var(--shadow);
         }
 
-        /* ============================================
-           HEADER
-           ============================================ */
+        /* HEADER */
         .header {
             display: flex;
             justify-content: space-between;
@@ -150,9 +142,7 @@
             border: 1px solid var(--border-color);
         }
 
-        /* ============================================
-           MENU HAMBÚRGUER
-           ============================================ */
+        /* MENU */
         .menu-hamburger {
             position: relative;
             display: inline-block;
@@ -233,9 +223,7 @@
             }
         }
 
-        /* ============================================
-           CÂMERA
-           ============================================ */
+        /* CÂMERA */
         .camera-box {
             position: relative;
             width: 100%;
@@ -330,9 +318,7 @@
             }
         }
 
-        /* ============================================
-           MATCH INFO
-           ============================================ */
+        /* MATCH INFO */
         .match-container {
             display: flex;
             align-items: center;
@@ -409,9 +395,7 @@
             background: var(--text-gray);
         }
 
-        /* ============================================
-           BOTÕES
-           ============================================ */
+        /* BOTÕES */
         .btn-group {
             display: flex;
             gap: 8px;
@@ -440,15 +424,9 @@
             color: #020617;
         }
 
-        .btn-primary:hover:not(:disabled) {
+        .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-            transform: none;
         }
 
         .btn-secondary {
@@ -484,9 +462,7 @@
             flex: none;
         }
 
-        /* ============================================
-           SEÇÕES OCULTAS
-           ============================================ */
+        /* SEÇÕES OCULTAS */
         .section-hidden {
             display: none;
             margin-top: 14px;
@@ -558,9 +534,7 @@
             gap: 10px;
         }
 
-        /* ============================================
-           CONFIG TOGGLE
-           ============================================ */
+        /* CONFIG TOGGLE */
         .config-item {
             display: flex;
             justify-content: space-between;
@@ -607,9 +581,21 @@
             left: 23px;
         }
 
-        /* ============================================
-           TABELA
-           ============================================ */
+        .config-item select {
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--text-light);
+            font-size: 13px;
+            outline: none;
+        }
+
+        .config-item select:focus {
+            border-color: var(--primary);
+        }
+
+        /* TABELA */
         .table-wrapper {
             overflow-x: auto;
             border-radius: 8px;
@@ -654,9 +640,7 @@
             font-style: italic;
         }
 
-        /* ============================================
-           TOAST
-           ============================================ */
+        /* TOAST */
         .toast-container {
             position: fixed;
             bottom: 20px;
@@ -704,9 +688,7 @@
             }
         }
 
-        /* ============================================
-           LOADING
-           ============================================ */
+        /* LOADING */
         .loading-overlay {
             display: none;
             position: fixed;
@@ -755,9 +737,7 @@
             color: var(--text-light);
         }
 
-        /* ============================================
-           RESPONSIVO
-           ============================================ */
+        /* RESPONSIVO */
         @media (max-width: 480px) {
             .container {
                 padding: 16px;
@@ -801,9 +781,7 @@
             }
         }
 
-        /* ============================================
-           IMPRESSÃO
-           ============================================ */
+        /* IMPRESSÃO */
         @media print {
             body {
                 background: white;
@@ -829,9 +807,6 @@
             }
         }
 
-        /* ============================================
-           FOOTER
-           ============================================ */
         footer {
             text-align: center;
             padding: 14px 0 0 0;
@@ -1070,13 +1045,13 @@
                 <span>•</span>
                 <span>🎵 Sons</span>
             </div>
-            &copy; 2026 Ponto Biométrico - Versão Estável
+            &copy; 2026 Ponto Biométrico - Versão Final
         </footer>
 
     </div>
 
     <!-- ==========================================
-    JAVASCRIPT COMPLETO - SEM IA
+    JAVASCRIPT COMPLETO
     ========================================== -->
     <script>
         // ============================================
@@ -1217,7 +1192,6 @@
                 sections[section].classList.add('open');
             }
 
-            // Atualiza menu
             document.querySelectorAll('.menu-dropdown .item').forEach(item => item.classList.remove('active'));
             const items = document.querySelectorAll('.menu-dropdown .item');
             const map = { 'main': 0, 'config': 1, 'admin': 2, 'pdf': 3 };
@@ -1313,7 +1287,6 @@
                 return;
             }
 
-            // Verifica se já registrou recentemente
             const pode = podeRegistrar();
             if (!pode.pode) {
                 showToast(`⏱️ Aguarde ${pode.tempoRestante} minuto(s) para registrar novamente`, 'warning');
@@ -1559,7 +1532,7 @@
                 });
 
                 html += `</tbody></table>
-                    <div class="footer">Ponto Biométrico - Versão Estável</div>
+                    <div class="footer">Ponto Biométrico - Versão Final</div>
                 </body></html>`;
 
                 janela.document.write(html);
@@ -1686,10 +1659,10 @@
         // ============================================
         // INICIALIZAÇÃO
         // ============================================
-        console.log('🔒 Ponto Biométrico - Versão Estável');
+        console.log('🔒 Ponto Biométrico - Versão Final');
         console.log('📌 Clique 3 vezes no logo "PONTO SEGURO" para ADM');
         console.log('⌨️ Enter = Capturar e Registrar | ESC = fechar menus | P = PDF');
-        console.log('📸 Sistema sem IA - 100% funcional!');
+        console.log('📸 Sistema sem IA - 100% funcional e estável!');
     </script>
 
 </body>
