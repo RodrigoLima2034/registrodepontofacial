@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ponto Biométrico - Versão Final</title>
+    <title>Ponto Biométrico - Funcional</title>
 
     <style>
         * {
@@ -834,11 +834,11 @@
 <body>
 
     <!-- LOADING -->
-    <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-overlay active" id="loadingOverlay">
         <div class="loading-spinner"></div>
         <div class="loading-text">
-            Iniciando sistema de ponto<br>
-            <strong>Versão Estável - Sem IA</strong>
+            Iniciando câmera e sistema<br>
+            <strong>Aguardando permissão...</strong>
         </div>
     </div>
 
@@ -1051,7 +1051,7 @@
     </div>
 
     <!-- ==========================================
-    JAVASCRIPT COMPLETO
+    JAVASCRIPT COMPLETO - CÂMERA FUNCIONAL
     ========================================== -->
     <script>
         // ============================================
@@ -1248,18 +1248,20 @@
             carregarHistorico();
             iniciarCamera();
             loadingOverlay.classList.remove('active');
-            showToast('📸 Sistema pronto! Posicione-se para a foto.', 'success');
+            showToast('📸 Câmera ativada! Posicione-se para a foto.', 'success');
         };
 
         request.onerror = function() {
             showToast('❌ Erro ao acessar banco de dados', 'error');
+            loadingOverlay.classList.remove('active');
         };
 
         // ============================================
-        // CÂMERA
+        // CÂMERA - CORRIGIDA
         // ============================================
         async function iniciarCamera() {
             try {
+                // Pede permissão e inicia a câmera
                 stream = await navigator.mediaDevices.getUserMedia({
                     audio: false,
                     video: {
@@ -1268,13 +1270,28 @@
                         height: { ideal: 480 }
                     }
                 });
+
+                // Conecta ao elemento video
                 video.srcObject = stream;
+
+                // Aguarda o carregamento
                 video.onloadedmetadata = () => {
                     video.play();
                     cameraBox.classList.add('active');
+                    console.log('✅ Câmera iniciada com sucesso!');
                 };
+
+                // Para garantir que a câmera funciona mesmo sem onloadedmetadata
+                setTimeout(() => {
+                    if (video.paused) {
+                        video.play();
+                    }
+                }, 1000);
+
             } catch (err) {
-                showToast('⚠️ Permita o acesso à câmera', 'error');
+                console.error('Erro na câmera:', err);
+                showToast('⚠️ Permita o acesso à câmera e recarregue a página', 'error');
+                loadingOverlay.classList.remove('active');
             }
         }
 
@@ -1290,6 +1307,12 @@
             const pode = podeRegistrar();
             if (!pode.pode) {
                 showToast(`⏱️ Aguarde ${pode.tempoRestante} minuto(s) para registrar novamente`, 'warning');
+                return;
+            }
+
+            // Verifica se a câmera está ativa
+            if (!video.srcObject || video.paused) {
+                showToast('⚠️ Câmera não está ativa. Recarregue a página.', 'error');
                 return;
             }
 
@@ -1375,6 +1398,12 @@
 
             if (colaboradores.some(w => w.id === id)) {
                 showToast('⚠️ Matrícula já cadastrada!', 'error');
+                return;
+            }
+
+            // Verifica se a câmera está ativa
+            if (!video.srcObject || video.paused) {
+                showToast('⚠️ Câmera não está ativa. Recarregue a página.', 'error');
                 return;
             }
 
@@ -1662,7 +1691,14 @@
         console.log('🔒 Ponto Biométrico - Versão Final');
         console.log('📌 Clique 3 vezes no logo "PONTO SEGURO" para ADM');
         console.log('⌨️ Enter = Capturar e Registrar | ESC = fechar menus | P = PDF');
-        console.log('📸 Sistema sem IA - 100% funcional e estável!');
+        console.log('📸 Sistema com câmera funcional!');
+
+        // Força a câmera após 2 segundos se não iniciou
+        setTimeout(() => {
+            if (!video.srcObject) {
+                iniciarCamera();
+            }
+        }, 2000);
     </script>
 
 </body>
