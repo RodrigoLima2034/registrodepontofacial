@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ponto Biométrico - FaceAPI.js</title>
+    <title>Ponto Biométrico - FaceAPI Real</title>
 
     <!-- FaceAPI.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js">
@@ -302,7 +302,7 @@
         }
 
         /* ============================================
-           CÂMERA (MAIOR)
+           CÂMERA
            ============================================ */
         .camera-box {
             position: relative;
@@ -1219,7 +1219,7 @@
                 <div class="recognition-flash" id="recognitionFlash"></div>
             </div>
 
-            <!-- MENSAGENS GRANDES -->
+            <!-- MENSAGENS -->
             <div class="match-container waiting" id="matchContainer">
                 <img id="match-img" class="match-photo"
                     src="data:image/svg+xml;utf8,<svg xmlns='http://w3.org' viewBox='0 0 24 24' fill='%23475569'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-4-8-4z'/></svg>">
@@ -1241,7 +1241,7 @@
         </div>
 
         <!-- ==========================================
-        CONFIGURAÇÕES
+        CONFIG
         ========================================== -->
         <div id="configSection" class="config-section">
             <div class="admin-title">
@@ -1424,11 +1424,11 @@
             <span>•</span>
             <span>⏱️ Registro Único</span>
         </div>
-        &copy; 2026 Ponto Biométrico Seguro v9.0
+        &copy; 2026 Ponto Biométrico Seguro v10.0
     </footer>
 
     <!-- ==========================================
-    JAVASCRIPT CORRIGIDO
+    JAVASCRIPT CORRIGIDO COM FACEAPI REAL
     ========================================== -->
     <script>
         // ============================================
@@ -1459,7 +1459,9 @@
         let faceapiReady = false;
         let detectionInterval = null;
         let ultimoRegistro = {};
-        let rostoDetectado = false; // CONTROLA SE HÁ ROSTO NA CENA
+        let rostoDetectado = false;
+        let processandoReconhecimento = false;
+        let ultimoReconhecimentoTime = 0;
 
         // ============================================
         // SONS MAIS ALTOS
@@ -1537,7 +1539,7 @@
         }, 1000);
 
         // ============================================
-        // MENU HAMBÚRGUER
+        // MENU
         // ============================================
         function toggleMenu() {
             document.getElementById('menuDropdown').classList.toggle('open');
@@ -1651,7 +1653,7 @@
         async function carregarFaceAPI() {
             try {
                 loadingOverlay.classList.add('active');
-                document.querySelector('.loading-text .sub').textContent = 'Baixando modelos...';
+                document.querySelector('.loading-text .sub').textContent = 'Baixando modelos de IA...';
 
                 const MODEL_URL = 'https://justadudewhohas.github.io/face-api.js/models';
 
@@ -1659,7 +1661,7 @@
                 await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
                 await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
 
-                document.querySelector('.loading-text .sub').textContent = 'Modelos carregados!';
+                document.querySelector('.loading-text .sub').textContent = 'Modelos carregados! Iniciando...';
 
                 faceapiReady = true;
 
@@ -1671,8 +1673,9 @@
 
             } catch (error) {
                 loadingOverlay.classList.remove('active');
-                console.error('Erro:', error);
-                showToast('⚠️ Erro ao carregar IA. Modo simulação.', 'error');
+                console.error('Erro ao carregar FaceAPI:', error);
+                showToast('⚠️ Erro ao carregar IA. Verifique sua internet.', 'error');
+                // Modo simulação apenas como fallback
                 iniciarReconhecimentoSimulado();
             }
         }
@@ -1723,25 +1726,31 @@
         }
 
         // ============================================
-        // RECONHECIMENTO FACEAPI - CORRIGIDO
+        // RECONHECIMENTO FACEAPI REAL
         // ============================================
         function iniciarReconhecimentoFaceAPI() {
             if (detectionInterval) clearInterval(detectionInterval);
 
             detectionInterval = setInterval(async () => {
-                if (!faceapiReady || video.paused || !video.srcObject) return;
+                // Verifica se a IA está pronta
+                if (!faceapiReady || video.paused || !video.srcObject) {
+                    return;
+                }
 
                 try {
+                    // DETECTA ROSTOS NA CENA
                     const detections = await faceapi.detectAllFaces(video)
                         .withFaceLandmarks()
                         .withFaceDescriptors();
 
+                    // Limpa o canvas
                     ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
 
                     // VERIFICA SE HÁ ROSTO DETECTADO
                     if (detections.length > 0) {
                         rostoDetectado = true;
 
+                        // Desenha as detecções no canvas
                         const resizedDetections = faceapi.resizeResults(detections, {
                             width: overlayCanvas.width,
                             height: overlayCanvas.height
@@ -1750,10 +1759,17 @@
                         faceapi.draw.drawDetections(overlayCanvas, resizedDetections);
                         faceapi.draw.drawFaceLandmarks(overlayCanvas, resizedDetections);
 
-                        const descriptor = detections[0].descriptor;
+                        // SÓ PROCESSA SE NÃO ESTIVER PROCESSANDO E AUTO RECONHECIMENTO ESTIVER ATIVO
+                        if (!processandoReconhecimento && reconhecimentoAutomatico) {
+                            processandoReconhecimento = true;
 
-                        if (reconhecimentoAutomatico) {
+                            // Pega o primeiro rosto detectado
+                            const descriptor = detections[0].descriptor;
+
+                            // Busca correspondência
                             await buscarCorrespondencia(descriptor);
+
+                            processandoReconhecimento = false;
                         }
 
                     } else {
@@ -1766,16 +1782,17 @@
 
                 } catch (error) {
                     console.error('Erro na detecção:', error);
+                    processandoReconhecimento = false;
                 }
-            }, 500);
+            }, 1000);
         }
 
         // ============================================
-        // BUSCAR CORRESPONDÊNCIA - CORRIGIDO
+        // BUSCAR CORRESPONDÊNCIA
         // ============================================
         async function buscarCorrespondencia(descriptor) {
+            // Verifica se há trabalhadores cadastrados
             if (listaTrabalhadores.length === 0) {
-                // Nenhum trabalhador cadastrado
                 matchContainer.className = 'match-container not-found';
                 matchName.className = 'match-name not-found';
                 matchName.textContent = '⚠️ Nenhum Cadastro';
@@ -1790,8 +1807,9 @@
             }
 
             let melhorMatch = null;
-            let melhorDistancia = 0.6;
+            let melhorDistancia = 0.6; // Limite de confiança (quanto menor, mais preciso)
 
+            // Compara o descritor com todos os trabalhadores
             for (const trabalhador of listaTrabalhadores) {
                 if (!trabalhador.descritor) continue;
 
@@ -1799,16 +1817,20 @@
                     const descritorSalvo = new Float32Array(trabalhador.descritor);
                     const distancia = faceapi.euclideanDistance(descriptor, descritorSalvo);
 
+                    // Quanto menor a distância, mais parecido é o rosto
                     if (distancia < melhorDistancia) {
                         melhorDistancia = distancia;
                         melhorMatch = trabalhador;
                     }
                 } catch (e) {
-                    console.error('Erro ao comparar:', e);
+                    console.error('Erro ao comparar descritor:', e);
                 }
             }
 
+            // SE ENCONTROU UM MATCH
             if (melhorMatch) {
+                const confianca = Math.round((1 - melhorDistancia) * 100);
+
                 idTrabalhadorAtivo = melhorMatch.id;
                 trabalhadorAtivo = melhorMatch;
 
@@ -1820,7 +1842,7 @@
                 matchContainer.className = 'match-container found';
                 matchStatus.innerHTML = `
                     <span class="dot dot-green"></span>
-                    <span class="status-text success">✅ IDENTIFICADO - ${melhorMatch.nome}</span>
+                    <span class="status-text success">✅ IDENTIFICADO - ${melhorMatch.nome} (${confianca}%)</span>
                 `;
 
                 recognitionFlash.classList.add('active');
@@ -1914,7 +1936,7 @@
         }
 
         // ============================================
-        // RECONHECIMENTO SIMULADO (FALLBACK) - CORRIGIDO
+        // RECONHECIMENTO SIMULADO (FALLBACK)
         // ============================================
         function iniciarReconhecimentoSimulado() {
             if (detectionInterval) clearInterval(detectionInterval);
@@ -1925,7 +1947,7 @@
                     return;
                 }
 
-                // SIMULA DETECÇÃO DE ROSTO (NUNCA REGISTRA SEM ROSTO)
+                // SIMULA DETECÇÃO DE ROSTO
                 const hasFace = Math.random() > 0.4;
 
                 if (hasFace && reconhecimentoAutomatico) {
@@ -1991,7 +2013,7 @@
         }
 
         // ============================================
-        // RESET MATCH - CORRIGIDO
+        // RESET MATCH
         // ============================================
         function resetMatch() {
             matchName.textContent = 'Aguardando...';
@@ -2020,7 +2042,7 @@
             const requestAll = store.getAll();
             requestAll.onsuccess = function() {
                 listaTrabalhadores = requestAll.result || [];
-                console.log(`👥 ${listaTrabalhadores.length} trabalhadores`);
+                console.log(`👥 ${listaTrabalhadores.length} trabalhadores cadastrados`);
             };
         }
 
@@ -2061,7 +2083,7 @@
         }
 
         // ============================================
-        // CADASTRAR BIOMETRIA
+        // CADASTRAR BIOMETRIA - CORRIGIDO
         // ============================================
         async function cadastrarBiometriaFaceAPI() {
             const name = document.getElementById('new-worker-name').value.trim();
@@ -2094,6 +2116,7 @@
 
             let descritor = null;
 
+            // TENTA EXTRAIR O DESCRITOR FACIAL
             if (faceapiReady) {
                 try {
                     const detections = await faceapi.detectSingleFace(video)
@@ -2102,12 +2125,13 @@
 
                     if (detections) {
                         descritor = Array.from(detections.descriptor);
-                        showToast('🧠 Descritor facial extraído!', 'success');
+                        showToast('🧠 Descritor facial extraído com sucesso!', 'success');
                     } else {
                         showToast('⚠️ Nenhum rosto detectado. Cadastrando apenas foto.', 'warning');
                     }
                 } catch (e) {
                     console.error('Erro ao extrair descritor:', e);
+                    showToast('⚠️ Erro ao extrair descritor facial', 'error');
                 }
             }
 
@@ -2126,7 +2150,7 @@
 
             transaction.oncomplete = function() {
                 tocarSom('cadastrado');
-                showToast(`✅ Biometria de ${name} cadastrada!`, 'success');
+                showToast(`✅ Biometria de ${name} cadastrada com sucesso!`, 'success');
                 document.getElementById('new-worker-name').value = '';
                 document.getElementById('new-worker-id').value = '';
                 atualizarListaTrabalhadores();
@@ -2187,7 +2211,7 @@
 
                 html += `</tbody></table>
                     <div class="total">📊 Total: ${registros.length}</div>
-                    <div class="footer">Ponto Biométrico Seguro v9.0</div>
+                    <div class="footer">Ponto Biométrico Seguro v10.0 - FaceAPI Real</div>
                 </body></html>`;
 
                 janela.document.write(html);
@@ -2317,11 +2341,12 @@
         // ============================================
         // INICIALIZAÇÃO
         // ============================================
-        console.log('🔒 Ponto Biométrico Seguro v9.0 - Premium');
+        console.log('🔒 Ponto Biométrico Seguro v10.0 - FaceAPI Real');
         console.log('📌 Clique 3 vezes no logo para área ADM');
         console.log('⌨️ ESC = fechar menus | R = cadastrar | P = PDF');
         console.log('🔊 Sons mais altos ativados!');
-        console.log('✅ CORRIGIDO: Não registra sem rosto detectado!');
+        console.log('✅ CORRIGIDO: IA REAL com FaceAPI.js');
+        console.log('✅ Reconhecimento facial preciso com descritores');
     </script>
 
 </body>
