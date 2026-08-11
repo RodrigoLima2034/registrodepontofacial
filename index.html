@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ponto Biométrico Seguro - Premium</title>
+    <title>Ponto Biométrico - Enterprise</title>
 
     <!-- FaceAPI.js -->
     <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js">
@@ -18,7 +18,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         :root {
@@ -26,17 +26,17 @@
             --primary-dark: #059669;
             --primary-light: #34d399;
             --secondary: #06b6d4;
-            --bg-dark: #0f172a;
-            --bg-card: #1e293b;
-            --border-color: #334155;
-            --text-light: #f8fafc;
-            --text-muted: #94a3b8;
-            --text-gray: #475569;
+            --bg-dark: #0a0a12;
+            --bg-card: #14141e;
+            --border-color: #2a2a3e;
+            --text-light: #f0f0f0;
+            --text-muted: #8888aa;
+            --text-gray: #555577;
             --danger: #f43f5e;
             --warning: #f59e0b;
             --success: #10b981;
-            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            --radius: 16px;
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            --radius: 12px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -45,32 +45,17 @@
             color: var(--text-light);
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
             padding: 20px;
-            background-image: radial-gradient(ellipse at 50% 0%, #1e293b 0%, #0f172a 70%);
+            background-image: radial-gradient(ellipse at 50% 0%, #1a1a2e 0%, #0a0a12 70%);
         }
 
         /* ============================================
-           SCROLLBAR
-           ============================================ */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--bg-dark);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 10px;
-        }
-
-        /* ============================================
-           CONTAINER PRINCIPAL
+           CONTAINER
            ============================================ */
         .container {
-            max-width: 580px;
+            max-width: 540px;
             width: 100%;
             background: var(--bg-card);
             border-radius: var(--radius);
@@ -97,18 +82,18 @@
             gap: 10px;
             cursor: pointer;
             user-select: none;
-            padding: 6px 12px;
+            padding: 4px 10px;
             border-radius: 10px;
             transition: var(--transition);
         }
 
         .logo:hover {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.03);
         }
 
         .logo .dot {
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             background: var(--primary);
             border-radius: 50%;
             animation: pulse 2s infinite;
@@ -118,7 +103,7 @@
         .logo .dot::after {
             content: '';
             position: absolute;
-            inset: -4px;
+            inset: -3px;
             border-radius: 50%;
             border: 2px solid var(--primary);
             animation: pulse-ring 2s infinite;
@@ -146,25 +131,26 @@
 
         .logo-text {
             font-weight: 700;
-            font-size: 18px;
+            font-size: 16px;
             background: linear-gradient(135deg, var(--primary-light), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            letter-spacing: 0.5px;
         }
 
         .header-right {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .clock {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             color: var(--text-muted);
-            background: rgba(255, 255, 255, 0.05);
-            padding: 6px 14px;
-            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 5px 12px;
+            border-radius: 8px;
             border: 1px solid var(--border-color);
         }
 
@@ -180,15 +166,15 @@
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             color: var(--text-light);
-            padding: 8px 16px;
-            border-radius: 10px;
+            padding: 6px 14px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             transition: var(--transition);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .menu-btn:hover {
@@ -202,8 +188,8 @@
             right: 0;
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            min-width: 220px;
+            border-radius: 10px;
+            min-width: 200px;
             box-shadow: var(--shadow);
             z-index: 50;
             overflow: hidden;
@@ -211,15 +197,15 @@
 
         .menu-dropdown.open {
             display: block;
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.2s ease;
         }
 
         .menu-dropdown .item {
-            padding: 12px 18px;
+            padding: 10px 16px;
             color: var(--text-muted);
             cursor: pointer;
             transition: var(--transition);
-            font-size: 14px;
+            font-size: 13px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
@@ -231,19 +217,19 @@
         }
 
         .menu-dropdown .item:hover {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.03);
             color: var(--text-light);
         }
 
         .menu-dropdown .item.active {
-            background: rgba(16, 185, 129, 0.15);
+            background: rgba(16, 185, 129, 0.08);
             color: var(--primary-light);
         }
 
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(-10px);
+                transform: translateY(-8px);
             }
             to {
                 opacity: 1;
@@ -258,9 +244,9 @@
             position: relative;
             width: 100%;
             aspect-ratio: 4/3;
-            max-height: 420px;
-            background: #020617;
-            border-radius: 12px;
+            max-height: 380px;
+            background: #000;
+            border-radius: 10px;
             overflow: hidden;
             border: 2px solid var(--border-color);
             transition: var(--transition);
@@ -268,7 +254,7 @@
 
         .camera-box.active {
             border-color: var(--primary);
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.1);
         }
 
         video {
@@ -290,9 +276,9 @@
         .scanner-overlay {
             position: absolute;
             inset: 0;
-            border: 2px solid rgba(16, 185, 129, 0.15);
-            border-radius: 12px;
-            margin: 12px;
+            border: 2px solid rgba(16, 185, 129, 0.1);
+            border-radius: 10px;
+            margin: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -300,9 +286,9 @@
         }
 
         .scanner-circle {
-            width: 150px;
-            height: 150px;
-            border: 2px dashed rgba(6, 182, 212, 0.25);
+            width: 130px;
+            height: 130px;
+            border: 2px dashed rgba(6, 182, 212, 0.2);
             border-radius: 50%;
             position: relative;
         }
@@ -313,8 +299,8 @@
             top: -2px;
             left: 50%;
             transform: translateX(-50%);
-            width: 40px;
-            height: 4px;
+            width: 30px;
+            height: 3px;
             background: var(--primary);
             border-radius: 2px;
             animation: scan 2s ease-in-out infinite;
@@ -333,8 +319,8 @@
         .recognition-flash {
             position: absolute;
             inset: 0;
-            background: rgba(16, 185, 129, 0.3);
-            border-radius: 12px;
+            background: rgba(16, 185, 129, 0.2);
+            border-radius: 10px;
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.1s;
@@ -358,47 +344,43 @@
         }
 
         /* ============================================
-           MENSAGENS DE STATUS
+           MATCH INFO
            ============================================ */
         .match-container {
             display: flex;
             align-items: center;
-            gap: 16px;
-            background: rgba(15, 23, 42, 0.6);
-            padding: 16px 20px;
-            border-radius: 12px;
+            gap: 14px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 14px 16px;
+            border-radius: 10px;
             border: 1px solid var(--border-color);
-            margin-top: 16px;
+            margin-top: 14px;
             transition: var(--transition);
-            min-height: 80px;
+            min-height: 70px;
         }
 
         .match-container.found {
             border-color: var(--primary);
-            background: rgba(16, 185, 129, 0.15);
-            border-width: 2px;
+            background: rgba(16, 185, 129, 0.06);
         }
 
         .match-container.registered {
             border-color: var(--warning);
-            background: rgba(245, 158, 11, 0.15);
-            border-width: 2px;
+            background: rgba(245, 158, 11, 0.06);
         }
 
         .match-container.not-found {
             border-color: var(--danger);
-            background: rgba(244, 63, 94, 0.15);
-            border-width: 2px;
+            background: rgba(244, 63, 94, 0.06);
         }
 
         .match-container.waiting {
             border-color: var(--border-color);
-            background: rgba(15, 23, 42, 0.6);
         }
 
         .match-photo {
-            width: 64px;
-            height: 64px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid var(--border-color);
@@ -409,46 +391,43 @@
 
         .match-photo.found {
             border-color: var(--primary);
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
         }
 
         .match-photo.registered {
             border-color: var(--warning);
-            box-shadow: 0 0 30px rgba(245, 158, 11, 0.4);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
         }
 
         .match-photo.not-found {
             border-color: var(--danger);
-            box-shadow: 0 0 30px rgba(244, 63, 94, 0.4);
+            box-shadow: 0 0 20px rgba(244, 63, 94, 0.2);
         }
 
         .match-info {
-            flex-grow: 1;
+            flex: 1;
         }
 
         .match-name {
             font-weight: 700;
-            font-size: 18px;
+            font-size: 16px;
             color: var(--text-light);
         }
 
         .match-name.found {
             color: var(--primary-light);
-            font-size: 20px;
         }
 
         .match-name.registered {
             color: var(--warning);
-            font-size: 20px;
         }
 
         .match-name.not-found {
             color: var(--danger);
-            font-size: 20px;
         }
 
         .match-status {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-muted);
             margin-top: 2px;
             display: flex;
@@ -457,8 +436,8 @@
         }
 
         .match-status .dot {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             display: inline-block;
             flex-shrink: 0;
@@ -480,20 +459,27 @@
         /* ============================================
            BOTÕES
            ============================================ */
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+
         .btn {
-            padding: 14px 20px;
+            padding: 12px 16px;
             border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             font-weight: 700;
-            font-size: 16px;
+            font-size: 14px;
             cursor: pointer;
             transition: var(--transition);
             flex: 1;
-            min-width: 80px;
+            min-width: 70px;
         }
 
         .btn:active {
-            transform: scale(0.97);
+            transform: scale(0.96);
         }
 
         .btn-primary {
@@ -503,11 +489,11 @@
 
         .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2);
         }
 
         .btn-primary:disabled {
-            opacity: 0.4;
+            opacity: 0.3;
             cursor: not-allowed;
             transform: none;
         }
@@ -518,16 +504,7 @@
         }
 
         .btn-secondary:hover {
-            background: #475569;
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #e11d48;
+            background: #3a3a4e;
         }
 
         .btn-success {
@@ -539,138 +516,56 @@
             background: var(--primary-dark);
         }
 
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #e11d48;
+        }
+
         .btn-sm {
-            padding: 8px 14px;
+            padding: 6px 12px;
             font-size: 12px;
             flex: none;
         }
 
-        .btn-group {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 12px;
-        }
-
-        .btn-group .btn {
-            flex: 1;
-            min-width: 80px;
-        }
-
         /* ============================================
-           CONFIGURAÇÕES
+           SEÇÕES OCULTAS
            ============================================ */
-        .config-section {
+        .section-hidden {
             display: none;
-            margin-top: 16px;
+            margin-top: 14px;
             padding: 16px;
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
             border: 1px solid var(--border-color);
         }
 
-        .config-section.open {
+        .section-hidden.open {
             display: block;
             animation: fadeIn 0.3s ease;
         }
 
-        .config-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .config-item:last-child {
-            border-bottom: none;
-        }
-
-        .config-item label {
+        .section-title {
             font-size: 14px;
-            color: var(--text-light);
-        }
-
-        .config-item .toggle {
-            position: relative;
-            width: 48px;
-            height: 26px;
-            background: var(--border-color);
-            border-radius: 13px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .config-item .toggle.active {
-            background: var(--primary);
-        }
-
-        .config-item .toggle .thumb {
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            width: 20px;
-            height: 20px;
-            background: white;
-            border-radius: 50%;
-            transition: var(--transition);
-        }
-
-        .config-item .toggle.active .thumb {
-            left: 25px;
-        }
-
-        .config-item select {
-            background: var(--bg-dark);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 6px 12px;
-            color: var(--text-light);
-            font-size: 14px;
-            outline: none;
-        }
-
-        .config-item select:focus {
-            border-color: var(--primary);
-        }
-
-        /* ============================================
-           ADMIN PANEL
-           ============================================ */
-        .admin-section {
-            display: none;
-            margin-top: 16px;
-            padding: 16px;
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
-
-        .admin-section.open {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .admin-title {
-            font-size: 16px;
             font-weight: 700;
+            color: var(--text-muted);
             margin-bottom: 12px;
-            color: #cbd5e1;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
+            padding-bottom: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .admin-title .badge {
+        .section-title .badge {
             font-size: 10px;
-            padding: 4px 12px;
-            border-radius: 20px;
-            background: rgba(244, 63, 94, 0.2);
+            padding: 2px 10px;
+            border-radius: 12px;
+            background: rgba(244, 63, 94, 0.15);
             color: var(--danger);
-            font-weight: 600;
-            text-transform: uppercase;
         }
 
         .input-group {
@@ -679,7 +574,6 @@
 
         .input-group label {
             font-size: 11px;
-            font-weight: 600;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -690,12 +584,12 @@
         .input-group input,
         .input-group select {
             width: 100%;
-            padding: 10px 14px;
+            padding: 9px 12px;
             background: var(--bg-dark);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             color: var(--text-light);
-            font-size: 14px;
+            font-size: 13px;
             outline: none;
             transition: var(--transition);
         }
@@ -712,67 +606,113 @@
         }
 
         /* ============================================
-           TABELA DE LOGS
+           CONFIG TOGGLE
            ============================================ */
-        .log-table-wrapper {
-            overflow-x: auto;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            margin-top: 10px;
+        .config-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .log-table {
+        .config-item:last-child {
+            border-bottom: none;
+        }
+
+        .config-item label {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .config-item .toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .config-item .toggle.active {
+            background: var(--primary);
+        }
+
+        .config-item .toggle .thumb {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .config-item .toggle.active .thumb {
+            left: 23px;
+        }
+
+        .config-item select {
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--text-light);
+            font-size: 13px;
+            outline: none;
+        }
+
+        .config-item select:focus {
+            border-color: var(--primary);
+        }
+
+        /* ============================================
+           TABELA
+           ============================================ */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-top: 8px;
+        }
+
+        .table-wrapper table {
             width: 100%;
             border-collapse: collapse;
             font-size: 12px;
         }
 
-        .log-table th,
-        .log-table td {
-            padding: 8px 10px;
+        .table-wrapper th,
+        .table-wrapper td {
+            padding: 6px 10px;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
         }
 
-        .log-table th {
+        .table-wrapper th {
             color: var(--text-muted);
             font-weight: 600;
             text-transform: uppercase;
             font-size: 10px;
             letter-spacing: 0.5px;
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.02);
         }
 
-        .log-table .photo-preview {
-            width: 35px;
-            height: 28px;
+        .table-wrapper .photo-preview {
+            width: 32px;
+            height: 26px;
             object-fit: cover;
             border-radius: 4px;
             border: 1px solid var(--border-color);
         }
 
-        .log-table .empty-row td {
+        .table-wrapper .empty {
             text-align: center;
-            color: var(--text-muted);
-            padding: 20px;
-            font-style: italic;
-        }
-
-        /* ============================================
-           PDF SECTION
-           ============================================ */
-        .pdf-section {
-            display: none;
-            margin-top: 16px;
+            color: var(--text-gray);
             padding: 16px;
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
-
-        .pdf-section.open {
-            display: block;
-            animation: fadeIn 0.3s ease;
+            font-style: italic;
         }
 
         /* ============================================
@@ -785,22 +725,22 @@
             z-index: 999;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            max-width: 360px;
+            gap: 6px;
+            max-width: 340px;
             width: 100%;
         }
 
         .toast {
-            padding: 14px 20px;
-            border-radius: 12px;
+            padding: 12px 18px;
+            border-radius: 10px;
             color: white;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             animation: slideUp 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .toast-success {
@@ -835,12 +775,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.9);
             z-index: 9999;
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
         }
 
         .loading-overlay.active {
@@ -848,10 +788,10 @@
         }
 
         .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid var(--border-color);
-            border-top: 4px solid var(--primary);
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -866,42 +806,14 @@
         }
 
         .loading-text {
-            color: var(--text-light);
-            font-size: 16px;
+            color: var(--text-muted);
+            font-size: 14px;
             text-align: center;
             line-height: 1.6;
         }
 
-        .loading-text .sub {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        /* ============================================
-           FOOTER
-           ============================================ */
-        footer {
-            text-align: center;
-            padding: 16px;
-            font-size: 11px;
-            color: var(--text-gray);
-            border-top: 1px solid var(--border-color);
-            margin-top: 20px;
-            max-width: 580px;
-            width: 100%;
-        }
-
-        footer .footer-icons {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
-        }
-
-        footer .footer-icons span {
-            font-size: 12px;
-            color: var(--text-muted);
+        .loading-text strong {
+            color: var(--text-light);
         }
 
         /* ============================================
@@ -911,39 +823,19 @@
             .container {
                 padding: 16px;
             }
-            .input-row {
-                grid-template-columns: 1fr;
-            }
-            .header {
-                flex-wrap: wrap;
-                gap: 8px;
-            }
             .logo-text {
-                font-size: 15px;
+                font-size: 14px;
             }
             .clock {
-                font-size: 12px;
+                font-size: 11px;
                 padding: 4px 10px;
             }
             .menu-btn {
                 font-size: 12px;
-                padding: 6px 12px;
+                padding: 5px 10px;
             }
-            .match-container {
-                padding: 12px 14px;
-                min-height: 70px;
-            }
-            .match-photo {
-                width: 50px;
-                height: 50px;
-            }
-            .match-name {
-                font-size: 15px;
-            }
-            .match-name.found,
-            .match-name.registered,
-            .match-name.not-found {
-                font-size: 17px;
+            .input-row {
+                grid-template-columns: 1fr;
             }
             .btn-group {
                 flex-direction: column;
@@ -952,13 +844,21 @@
                 flex: none;
                 width: 100%;
             }
-            .menu-dropdown {
-                right: -40px;
-                min-width: 180px;
+            .match-container {
+                padding: 10px 12px;
+                min-height: 60px;
+            }
+            .match-photo {
+                width: 44px;
+                height: 44px;
             }
             .scanner-circle {
                 width: 100px;
                 height: 100px;
+            }
+            .menu-dropdown {
+                right: -30px;
+                min-width: 170px;
             }
         }
 
@@ -971,54 +871,67 @@
                 color: #333;
             }
             .camera-box,
-            .scanner-overlay,
-            .btn,
             .btn-group,
-            .input-group,
-            header,
-            footer,
-            .match-container,
-            .menu-hamburger {
+            .header .clock,
+            .menu-hamburger,
+            .match-container {
                 display: none !important;
             }
-            .admin-section {
-                display: block !important;
+            .container {
+                box-shadow: none;
                 border: none;
-                padding: 0;
                 background: white;
             }
-            .log-table th {
-                background: #f0f0f0;
-                color: #333;
+            .section-hidden {
+                display: block !important;
+                border: none;
+                background: white;
+                padding: 0;
             }
-            .log-table td {
-                border-color: #ddd;
-            }
+        }
+
+        /* ============================================
+           FOOTER
+           ============================================ */
+        footer {
+            text-align: center;
+            padding: 14px 0 0 0;
+            font-size: 11px;
+            color: var(--text-gray);
+            border-top: 1px solid var(--border-color);
+            margin-top: 16px;
+        }
+
+        footer .footer-icons {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+
+        footer .footer-icons span {
+            font-size: 11px;
+            color: var(--text-muted);
         }
     </style>
 </head>
 
 <body>
 
-    <!-- ==========================================
-    LOADING
-    ========================================== -->
+    <!-- LOADING -->
     <div class="loading-overlay active" id="loadingOverlay">
         <div class="loading-spinner"></div>
         <div class="loading-text">
-            🧠 Carregando IA de Reconhecimento Facial<br>
-            <span class="sub">FaceAPI.js - Processamento local e gratuito</span>
+            Carregando IA de Reconhecimento Facial<br>
+            <strong>FaceAPI.js - Processamento Local</strong>
         </div>
     </div>
 
-    <!-- ==========================================
-    TOAST
-    ========================================== -->
+    <!-- TOAST -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- ==========================================
-    CONTAINER PRINCIPAL
-    ========================================== -->
+    <!-- CONTAINER -->
     <div class="container">
 
         <!-- HEADER -->
@@ -1041,7 +954,7 @@
             </div>
         </div>
 
-        <!-- CARD PRINCIPAL -->
+        <!-- MAIN SECTION -->
         <div id="mainSection">
             <div class="camera-box" id="cameraBox">
                 <video id="video" autoplay playsinline muted></video>
@@ -1065,35 +978,35 @@
             </div>
 
             <div class="btn-group">
-                <button class="btn btn-primary" id="btnRegister" disabled>✅ Registrar Ponto</button>
+                <button class="btn btn-primary" id="btnRegister" disabled>✅ Registrar</button>
                 <button class="btn btn-secondary" onclick="toggleSection('admin')">🔒 ADM</button>
                 <button class="btn btn-secondary" onclick="toggleSection('pdf')">📄 PDF</button>
             </div>
         </div>
 
-        <!-- CONFIGURAÇÕES -->
-        <div id="configSection" class="config-section">
-            <div class="admin-title">
+        <!-- CONFIG -->
+        <div id="configSection" class="section-hidden">
+            <div class="section-title">
                 <span>⚙️ Configurações</span>
                 <span class="badge">PREFERENCES</span>
             </div>
 
             <div class="config-item">
-                <label>🔊 Som de Reconhecimento</label>
+                <label>🔊 Som Reconhecimento</label>
                 <div class="toggle active" onclick="toggleConfig(this)">
                     <div class="thumb"></div>
                 </div>
             </div>
 
             <div class="config-item">
-                <label>🔊 Som de Cadastro</label>
+                <label>🔊 Som Cadastro</label>
                 <div class="toggle active" onclick="toggleConfig(this)">
                     <div class="thumb"></div>
                 </div>
             </div>
 
             <div class="config-item">
-                <label>🔊 Som de Rosto Desconhecido</label>
+                <label>🔊 Som Desconhecido</label>
                 <div class="toggle active" onclick="toggleConfig(this)">
                     <div class="thumb"></div>
                 </div>
@@ -1107,7 +1020,7 @@
             </div>
 
             <div class="config-item">
-                <label>⏱️ Intervalo entre registros</label>
+                <label>⏱️ Intervalo Registro</label>
                 <select id="intervaloRegistro">
                     <option value="1">1 minuto</option>
                     <option value="5" selected>5 minutos</option>
@@ -1115,15 +1028,14 @@
                     <option value="15">15 minutos</option>
                     <option value="30">30 minutos</option>
                     <option value="60">1 hora</option>
-                    <option value="120">2 horas</option>
                     <option value="480">8 horas (1 vez/dia)</option>
                 </select>
             </div>
         </div>
 
         <!-- ADMIN -->
-        <div id="adminSection" class="admin-section">
-            <div class="admin-title">
+        <div id="adminSection" class="section-hidden">
+            <div class="section-title">
                 <span>🔒 Painel Administrativo</span>
                 <span class="badge">RESTRITO</span>
             </div>
@@ -1162,7 +1074,7 @@
                 </div>
             </div>
 
-            <button class="btn btn-success" onclick="cadastrarBiometria()" style="width:100%;margin-bottom:12px;">
+            <button class="btn btn-success" onclick="cadastrarBiometria()" style="width:100%;margin-bottom:10px;">
                 💾 Salvar Biometria
             </button>
 
@@ -1171,81 +1083,76 @@
                 <button class="btn btn-danger btn-sm" onclick="limparHistorico()" style="flex:1;">🗑️ Limpar</button>
             </div>
 
-            <div class="admin-title" style="margin-top:16px;border-top:1px solid var(--border-color);padding-top:12px;">
-                <span>📋 Histórico</span>
-                <span id="logCount" style="font-size:12px;color:var(--text-muted);">0</span>
-            </div>
-
-            <div class="log-table-wrapper">
-                <table class="log-table">
-                    <thead>
-                        <tr>
-                            <th>Foto</th>
-                            <th>Nome</th>
-                            <th>Matrícula</th>
-                            <th>Data/Hora</th>
-                        </tr>
-                    </thead>
-                    <tbody id="logBody">
-                        <tr class="empty-row">
-                            <td colspan="4">📭 Nenhum registro</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div style="margin-top:12px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-color);padding-bottom:6px;margin-bottom:6px;">
+                    <span style="font-size:12px;color:var(--text-muted);">📋 Histórico</span>
+                    <span id="logCount" style="font-size:11px;color:var(--text-gray);">0</span>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Foto</th>
+                                <th>Nome</th>
+                                <th>Matrícula</th>
+                                <th>Data/Hora</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logBody">
+                            <tr><td colspan="4" class="empty">📭 Nenhum registro</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
         <!-- PDF -->
-        <div id="pdfSection" class="pdf-section">
-            <div class="admin-title">
+        <div id="pdfSection" class="section-hidden">
+            <div class="section-title">
                 <span>📄 Relatórios</span>
                 <span class="badge">PDF</span>
             </div>
 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                <button class="btn btn-secondary" onclick="exportarPDF()" style="padding:14px;">
-                    📋 Relatório de Ponto
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <button class="btn btn-secondary" onclick="exportarPDF()" style="padding:12px;font-size:13px;">
+                    📋 Relatório Ponto
                 </button>
-                <button class="btn btn-secondary" onclick="exportarRelatorioCompleto()" style="padding:14px;background:#475569;">
+                <button class="btn btn-secondary" onclick="exportarRelatorioCompleto()" style="padding:12px;font-size:13px;background:#475569;">
                     📊 Relatório Completo
                 </button>
-                <button class="btn btn-secondary" onclick="exportarXML()" style="padding:14px;background:#06b6d4;color:#020617;">
+                <button class="btn btn-secondary" onclick="exportarXML()" style="padding:12px;font-size:13px;background:#06b6d4;color:#020617;">
                     📄 XML Oracle
                 </button>
-                <button class="btn btn-secondary" onclick="exportarCSV()" style="padding:14px;background:#f59e0b;color:#020617;">
+                <button class="btn btn-secondary" onclick="exportarCSV()" style="padding:12px;font-size:13px;background:#f59e0b;color:#020617;">
                     📊 CSV Excel
                 </button>
             </div>
 
-            <div style="margin-top:16px;background:rgba(30,41,59,0.5);padding:16px;border-radius:8px;">
-                <p style="font-size:12px;color:var(--text-muted);text-align:center;">
-                    📁 Documentos gerados em tempo real
+            <div style="margin-top:12px;background:rgba(0,0,0,0.2);padding:12px;border-radius:8px;">
+                <p style="font-size:11px;color:var(--text-muted);text-align:center;">
+                    📁 Documentos gerados em tempo real com os dados do sistema
                 </p>
             </div>
         </div>
 
+        <!-- FOOTER -->
+        <footer>
+            <div class="footer-icons">
+                <span>🔒 Reconhecimento Local</span>
+                <span>•</span>
+                <span>🧠 FaceAPI.js</span>
+                <span>•</span>
+                <span>📄 Exportação</span>
+                <span>•</span>
+                <span>🎵 Sons IA</span>
+            </div>
+            &copy; 2026 Ponto Biométrico Enterprise v2.0
+        </footer>
+
     </div>
 
     <!-- ==========================================
-    FOOTER
-    ========================================== -->
-    <footer>
-        <div class="footer-icons">
-            <span>🔒 Reconhecimento Local</span>
-            <span>•</span>
-            <span>🧠 FaceAPI.js</span>
-            <span>•</span>
-            <span>📄 Exportação PDF</span>
-            <span>•</span>
-            <span>🎵 Sons IA</span>
-            <span>•</span>
-            <span>⏱️ Registro Único</span>
-        </div>
-        &copy; 2026 Ponto Biométrico Seguro v11.0
-    </footer>
-
-    <!-- ==========================================
-    JAVASCRIPT COMPLETO - COM FACEAPI REAL
+    JAVASCRIPT COMPLETO
     ========================================== -->
     <script>
         // ============================================
@@ -1277,7 +1184,7 @@
         let reconhecimentoAutomatico = true;
 
         // ============================================
-        // SONS MAIS ALTOS
+        // SONS
         // ============================================
         function tocarSom(tipo) {
             if (!somAtivo) return;
@@ -1289,29 +1196,29 @@
                 gain.connect(ctx.destination);
 
                 let freq = 440,
-                    dur = 0.5,
-                    vol = 0.8;
+                    dur = 0.4,
+                    vol = 0.7;
 
                 switch (tipo) {
                     case 'reconhecido':
                         freq = 880;
-                        dur = 0.5;
-                        vol = 0.9;
+                        dur = 0.4;
+                        vol = 0.85;
                         break;
                     case 'cadastrado':
                         freq = 660;
-                        dur = 0.6;
-                        vol = 0.9;
+                        dur = 0.5;
+                        vol = 0.85;
                         break;
                     case 'desconhecido':
                         freq = 220;
-                        dur = 0.7;
-                        vol = 0.8;
+                        dur = 0.6;
+                        vol = 0.7;
                         break;
                     default:
                         freq = 440;
-                        dur = 0.5;
-                        vol = 0.8;
+                        dur = 0.4;
+                        vol = 0.7;
                 }
 
                 osc.frequency.value = freq;
@@ -1322,7 +1229,7 @@
                 osc.stop(ctx.currentTime + dur);
 
                 if (tipo === 'reconhecido' || tipo === 'cadastrado') {
-                    setTimeout(() => { navigator.vibrate && navigator.vibrate(150); }, 100);
+                    setTimeout(() => { navigator.vibrate && navigator.vibrate(120); }, 100);
                 }
             } catch (e) { console.log('🔇 Som indisponível'); }
         }
@@ -1334,14 +1241,13 @@
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
-            const icons = { success: '✅', error: '❌', warning: '⚠️' };
-            toast.innerHTML = `${icons[type] || '📢'} ${message}`;
+            toast.textContent = message;
             container.appendChild(toast);
             setTimeout(() => {
                 toast.style.opacity = '0';
                 toast.style.transform = 'translateX(100px)';
                 setTimeout(() => toast.remove(), 300);
-            }, 4000);
+            }, 3500);
         }
 
         // ============================================
@@ -1364,9 +1270,7 @@
 
         document.addEventListener('click', function(e) {
             const menu = document.querySelector('.menu-hamburger');
-            if (!menu.contains(e.target)) {
-                closeMenu();
-            }
+            if (!menu.contains(e.target)) closeMenu();
         });
 
         // ============================================
@@ -1393,9 +1297,7 @@
         // TOGGLE SECTION
         // ============================================
         function toggleSection(section) {
-            document.querySelectorAll('.card, .config-section, .admin-section, .pdf-section').forEach(el => {
-                el.style.display = 'none';
-            });
+            document.querySelectorAll('.section-hidden').forEach(el => el.classList.remove('open'));
 
             const sections = {
                 'main': document.getElementById('mainSection'),
@@ -1405,19 +1307,32 @@
             };
 
             if (sections[section]) {
-                sections[section].style.display = 'block';
+                sections[section].classList.add('open');
             }
 
+            // Atualiza menu
             document.querySelectorAll('.menu-dropdown .item').forEach(item => item.classList.remove('active'));
             const items = document.querySelectorAll('.menu-dropdown .item');
             const map = { 'main': 0, 'config': 1, 'admin': 2, 'pdf': 3 };
             if (map[section] !== undefined && items[map[section]]) {
                 items[map[section]].classList.add('active');
             }
+
+            // Esconde main quando outra seção está aberta
+            if (section !== 'main') {
+                document.getElementById('mainSection').style.display = 'none';
+            } else {
+                document.getElementById('mainSection').style.display = 'block';
+            }
+
+            if (section === 'admin') carregarHistorico();
         }
 
+        // Mostra main por padrão
+        document.getElementById('mainSection').style.display = 'block';
+
         // ============================================
-        // TRIGGER ADMIN
+        // TRIGGER ADMIN (3 cliques)
         // ============================================
         admTrigger.addEventListener('click', () => {
             clickCount++;
@@ -1467,7 +1382,7 @@
         async function carregarFaceAPI() {
             try {
                 loadingOverlay.classList.add('active');
-                document.querySelector('.loading-text .sub').textContent = 'Baixando modelos de IA...';
+                document.querySelector('.loading-text strong').textContent = 'FaceAPI.js - Baixando modelos...';
 
                 const MODEL_URL = 'https://justadudewhohas.github.io/face-api.js/models';
 
@@ -1475,19 +1390,17 @@
                 await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
                 await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
 
-                document.querySelector('.loading-text .sub').textContent = 'Modelos carregados!';
-
                 faceapiReady = true;
 
                 setTimeout(() => {
                     loadingOverlay.classList.remove('active');
                     showToast('🧠 IA de reconhecimento facial pronta!', 'success');
                     iniciarReconhecimento();
-                }, 500);
+                }, 400);
 
             } catch (error) {
                 loadingOverlay.classList.remove('active');
-                console.error('Erro ao carregar FaceAPI:', error);
+                console.error('Erro FaceAPI:', error);
                 showToast('⚠️ Erro ao carregar IA. Modo simulação.', 'error');
                 iniciarReconhecimentoSimulado();
             }
@@ -1534,7 +1447,7 @@
         }
 
         // ============================================
-        // RECONHECIMENTO FACEAPI REAL
+        // RECONHECIMENTO REAL
         // ============================================
         function iniciarReconhecimento() {
             if (detectionInterval) clearInterval(detectionInterval);
@@ -1679,7 +1592,7 @@
                     return;
                 }
 
-                const hasFace = Math.random() > 0.4;
+                const hasFace = Math.random() > 0.35;
 
                 if (hasFace && reconhecimentoAutomatico) {
                     rostoDetectado = true;
@@ -1821,7 +1734,7 @@
                 logCount.textContent = `${registros.length}`;
 
                 if (registros.length === 0) {
-                    tbody.innerHTML = `<tr class="empty-row"><td colspan="4">📭 Nenhum registro</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="4" class="empty">📭 Nenhum registro</td></tr>`;
                     return;
                 }
 
@@ -1934,14 +1847,13 @@
                 <style>
                     body { font-family: Arial; padding:30px; color:#333; }
                     .header { text-align:center; border-bottom:2px solid #111; padding-bottom:15px; margin-bottom:25px; }
-                    .header h1 { margin:0; font-size:22px; text-transform:uppercase; }
+                    .header h1 { margin:0; font-size:22px; }
                     .header p { margin:5px 0 0; font-size:13px; color:#555; }
                     table { width:100%; border-collapse:collapse; margin-top:15px; }
                     th, td { border:1px solid #777; padding:10px; text-align:left; font-size:12px; }
-                    th { background:#eaeaea; font-weight:bold; }
-                    .photo-preview { width:50px; height:38px; object-fit:cover; border-radius:4px; }
-                    .footer { margin-top:50px; text-align:center; font-size:11px; color:#777; border-top:1px solid #ddd; padding-top:15px; }
-                    .total { font-weight:bold; font-size:14px; margin-top:10px; }
+                    th { background:#eaeaea; }
+                    .photo-preview { width:40px; height:32px; object-fit:cover; border-radius:4px; }
+                    .footer { margin-top:40px; text-align:center; font-size:11px; color:#777; border-top:1px solid #ddd; padding-top:15px; }
                 </style>
                 </head>
                 <body>
@@ -1963,8 +1875,7 @@
                 });
 
                 html += `</tbody></table>
-                    <div class="total">📊 Total: ${registros.length}</div>
-                    <div class="footer">Ponto Biométrico Seguro v11.0</div>
+                    <div class="footer">Ponto Biométrico Enterprise v2.0</div>
                 </body></html>`;
 
                 janela.document.write(html);
@@ -1976,7 +1887,7 @@
 
         function exportarRelatorioCompleto() {
             showToast('📊 Gerando relatório completo...', 'info');
-            setTimeout(() => { exportarPDF(); }, 500);
+            setTimeout(() => { exportarPDF(); }, 400);
         }
 
         function exportarXML() {
@@ -2073,18 +1984,15 @@
         // ============================================
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                document.querySelectorAll('.config-section, .admin-section, .pdf-section').forEach(el => {
-                    el.style.display = 'none';
-                });
+                document.querySelectorAll('.section-hidden').forEach(el => el.classList.remove('open'));
                 document.getElementById('mainSection').style.display = 'block';
                 document.querySelectorAll('.menu-dropdown .item').forEach(item => item.classList.remove('active'));
                 document.querySelectorAll('.menu-dropdown .item')[0]?.classList.add('active');
                 closeMenu();
             }
-            if (e.key === 'r' || e.key === 'R') {
-                if (document.getElementById('adminSection').style.display === 'block') {
-                    cadastrarBiometria();
-                }
+            if ((e.key === 'r' || e.key === 'R') && document.getElementById('adminSection').classList.contains(
+                    'open')) {
+                cadastrarBiometria();
             }
             if (e.key === 'p' || e.key === 'P') {
                 exportarPDF();
@@ -2094,11 +2002,11 @@
         // ============================================
         // INICIALIZAÇÃO
         // ============================================
-        console.log('🔒 Ponto Biométrico Seguro v11.0');
-        console.log('📌 Clique 3 vezes no logo para ADM');
+        console.log('🔒 Ponto Biométrico Enterprise v2.0');
+        console.log('📌 Clique 3 vezes no logo "PONTO SEGURO" para ADM');
         console.log('⌨️ ESC = fechar menus | R = cadastrar | P = PDF');
-        console.log('🔊 Sons mais altos ativados!');
         console.log('✅ Reconhecimento facial REAL com FaceAPI.js');
+        console.log('🔊 Sons ativados!');
     </script>
 
 </body>
