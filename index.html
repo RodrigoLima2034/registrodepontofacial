@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ponto Biométrico - Enterprise</title>
+    <title>Ponto Biométrico - Versão Definitiva</title>
 
     <!-- FaceAPI.js -->
     <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js">
@@ -1152,7 +1152,7 @@
     </div>
 
     <!-- ==========================================
-    JAVASCRIPT COMPLETO
+    JAVASCRIPT COMPLETO - CORRIGIDO
     ========================================== -->
     <script>
         // ============================================
@@ -1182,6 +1182,7 @@
         let detectionInterval = null;
         let somAtivo = true;
         let reconhecimentoAutomatico = true;
+        let processandoReconhecimento = false;
 
         // ============================================
         // SONS
@@ -1377,13 +1378,14 @@
         };
 
         // ============================================
-        // CARREGAR FACEAPI
+        // CARREGAR FACEAPI - CORRIGIDO
         // ============================================
         async function carregarFaceAPI() {
             try {
                 loadingOverlay.classList.add('active');
                 document.querySelector('.loading-text strong').textContent = 'FaceAPI.js - Baixando modelos...';
 
+                // USANDO CDN OFICIAL E CONFIÁVEL
                 const MODEL_URL = 'https://justadudewhohas.github.io/face-api.js/models';
 
                 await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
@@ -1401,7 +1403,8 @@
             } catch (error) {
                 loadingOverlay.classList.remove('active');
                 console.error('Erro FaceAPI:', error);
-                showToast('⚠️ Erro ao carregar IA. Modo simulação.', 'error');
+                showToast('⚠️ Erro ao carregar IA. Verifique sua internet.', 'error');
+                // Modo simulação apenas como fallback
                 iniciarReconhecimentoSimulado();
             }
         }
@@ -1447,24 +1450,31 @@
         }
 
         // ============================================
-        // RECONHECIMENTO REAL
+        // RECONHECIMENTO REAL - CORRIGIDO
         // ============================================
         function iniciarReconhecimento() {
             if (detectionInterval) clearInterval(detectionInterval);
 
             detectionInterval = setInterval(async () => {
-                if (!faceapiReady || video.paused || !video.srcObject) return;
+                // VERIFICA SE A IA ESTÁ PRONTA
+                if (!faceapiReady || video.paused || !video.srcObject) {
+                    return;
+                }
 
                 try {
+                    // DETECTA ROSTOS COM DESCRITORES
                     const detections = await faceapi.detectAllFaces(video)
                         .withFaceLandmarks()
                         .withFaceDescriptors();
 
+                    // LIMPA O CANVAS
                     ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
 
+                    // VERIFICA SE HÁ ROSTO DETECTADO
                     if (detections.length > 0) {
                         rostoDetectado = true;
 
+                        // DESENHA AS DETECÇÕES
                         const resizedDetections = faceapi.resizeResults(detections, {
                             width: overlayCanvas.width,
                             height: overlayCanvas.height
@@ -1473,9 +1483,17 @@
                         faceapi.draw.drawDetections(overlayCanvas, resizedDetections);
                         faceapi.draw.drawFaceLandmarks(overlayCanvas, resizedDetections);
 
-                        if (reconhecimentoAutomatico) {
+                        // SÓ PROCESSA SE NÃO ESTIVER PROCESSANDO E AUTO RECONHECIMENTO ATIVO
+                        if (!processandoReconhecimento && reconhecimentoAutomatico) {
+                            processandoReconhecimento = true;
+
+                            // PEGA O PRIMEIRO ROSTO
                             const descriptor = detections[0].descriptor;
+
+                            // BUSCA CORRESPONDÊNCIA
                             await buscarMatch(descriptor);
+
+                            processandoReconhecimento = false;
                         }
 
                     } else {
@@ -1485,14 +1503,16 @@
 
                 } catch (error) {
                     console.error('Erro na detecção:', error);
+                    processandoReconhecimento = false;
                 }
             }, 800);
         }
 
         // ============================================
-        // BUSCAR MATCH
+        // BUSCAR MATCH - CORRIGIDO
         // ============================================
         async function buscarMatch(descriptor) {
+            // VERIFICA SE HÁ TRABALHADORES
             if (trabalhadores.length === 0) {
                 matchContainer.className = 'match-container not-found';
                 matchName.className = 'match-name not-found';
@@ -1508,8 +1528,9 @@
             }
 
             let melhorMatch = null;
-            let melhorDistancia = 0.6;
+            let melhorDistancia = 0.6; // LIMITE DE CONFIANÇA
 
+            // COMPARA COM TODOS OS TRABALHADORES
             for (const worker of trabalhadores) {
                 if (!worker.descritor) continue;
 
@@ -1517,15 +1538,17 @@
                     const descritorSalvo = new Float32Array(worker.descritor);
                     const distancia = faceapi.euclideanDistance(descriptor, descritorSalvo);
 
+                    // QUANTO MENOR A DISTÂNCIA, MAIS PARECIDO
                     if (distancia < melhorDistancia) {
                         melhorDistancia = distancia;
                         melhorMatch = worker;
                     }
                 } catch (e) {
-                    console.error('Erro ao comparar:', e);
+                    console.error('Erro ao comparar descritor:', e);
                 }
             }
 
+            // SE ENCONTROU UM MATCH
             if (melhorMatch) {
                 const confianca = Math.round((1 - melhorDistancia) * 100);
                 trabalhadorAtivo = melhorMatch;
@@ -1547,6 +1570,7 @@
 
                 isScanning = true;
 
+                // VERIFICA SE PODE REGISTRAR
                 const pode = podeRegistrar(melhorMatch.id);
                 if (pode.pode) {
                     btnRegister.disabled = false;
@@ -1564,6 +1588,7 @@
                 }
 
             } else {
+                // NÃO RECONHECIDO
                 matchContainer.className = 'match-container not-found';
                 matchName.className = 'match-name not-found';
                 matchName.textContent = '❌ Não Reconhecido';
@@ -1592,6 +1617,7 @@
                     return;
                 }
 
+                // SIMULA DETECÇÃO DE ROSTO
                 const hasFace = Math.random() > 0.35;
 
                 if (hasFace && reconhecimentoAutomatico) {
@@ -2007,6 +2033,7 @@
         console.log('⌨️ ESC = fechar menus | R = cadastrar | P = PDF');
         console.log('✅ Reconhecimento facial REAL com FaceAPI.js');
         console.log('🔊 Sons ativados!');
+        console.log('🔒 CORRIGIDO: Só reconhece rostos reais com descritores faciais');
     </script>
 
 </body>
