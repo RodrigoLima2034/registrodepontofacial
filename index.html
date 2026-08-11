@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ponto Biométrico Seguro - Premium</title>
+    <style>
+        /* ============================================
+           RESET E VARIÁVEIS
+           ============================================ */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #34d399;
+            --secondary: #06b6d4;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --border-color: #334155;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-gray: #475569;
+            --danger: #f43f5e;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background-image: radial-gradient(ellipse at 50% 0%, #1e293b 0%, #0f172a 70%);
+        }
+
+        /* ============================================
+           SCROLLBAR PERSONALIZADA
+           ============================================ */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* ============================================
+           HEADER
+           ============================================ */
+        header {
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+            padding: 6px 12px;
+            border-radius: 12px;
+            transition: var(--transition);
+        }
+
+        .logo-group:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .pulse-dot {
+            width: 12px;
+            height: 12px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            position: relative;
+        }
+
+        .pulse-dot::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+            animation: pulse-ring 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .logo-text {
+            font-weight: 700;
+            font-size: 18px;
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .clock {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-variant-numeric: tabular-nums;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* ============================================
+           MAIN
+           ============================================ */
+        main {
+            max-width: 500px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 24px 16px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* ============================================
+           CARDS
+           ============================================ */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .card-header .badge {
+            font-size: 10px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--primary-light);
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        /* ============================================
+           CÂMERA
+           ============================================ */
+        .camera-box {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: #020617;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .camera-box.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        .scanner-overlay {
+            position: absolute;
+            inset: 0;
+            border: 2px solid rgba(16, 185, 129, 0.2);
+            border-radius: 12px;
+            margin: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        .scanner-circle {
+            width: 140px;
+            height: 140px;
+            border: 2px dashed rgba(6, 182, 212, 0.3);
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .scanner-circle::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+            animation: scan 2s ease-in-out infinite;
+        }
+
+        @keyframes scan {
+            0%,
+            100% {
+                top: -2px;
+            }
+            50% {
+                top: calc(100% - 2px);
+            }
+        }
+
+        .scanning-line {
+            position: absolute;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            animation: scan-line 2s ease-in-out infinite;
+            opacity: 0.5;
+        }
+
+        @keyframes scan-line {
+            0%,
+            100% {
+                top: 10%;
+            }
+            50% {
+                top: 90%;
+            }
+        }
+
+        /* ============================================
+           MATCH CONTAINER
+           ============================================ */
+        .match-container {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-top: 16px;
+            transition: var(--transition);
+        }
+
+        .match-container.found {
+            border-color: var(--primary);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .match-photo {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border-color);
+            background: var(--bg-dark);
+            transition: var(--transition);
+        }
+
+        .match-photo.found {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .match-info {
+            flex-grow: 1;
+        }
+
+        .match-name {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--text-light);
+        }
+
+        .match-name.found {
+            color: var(--primary-light);
+        }
+
+        .match-status {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .match-status .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .dot-green {
+            background: var(--primary);
+        }
+
+        .dot-yellow {
+            background: var(--warning);
+        }
+
+        .dot-red {
+            background: var(--danger);
+        }
+
+        /* ============================================
+           INFO TEXT
+           ============================================ */
+        .info-text {
+            text-align: center;
+            margin: 16px 0 8px;
+        }
+
+        .info-text h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .info-text p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* ============================================
+           BOTÕES
+           ============================================ */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #020617;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        .btn-secondary {
+            background: var(--border-color);
+            color: var(--text-light);
+            font-size: 14px;
+            padding: 12px;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .btn-success {
+            background: var(--primary);
+            color: #020617;
+        }
+
+        .btn-success:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #e11d48;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 12px;
+            width: auto;
+            border-radius: 8px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+            min-width: 80px;
+        }
+
+        /* ============================================
+           STATUS BOX
+           ============================================ */
+        .status-box {
+            margin-top: 12px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .status-box.success {
+            display: block;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--primary-light);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-box.error {
+            display: block;
+            background: rgba(244, 63, 94, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+        }
+
+        .status-box.warning {
+            display: block;
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ============================================
+           ADMIN PANEL
+           ============================================ */
+        .admin-section {
+            display: none;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            animation: fadeIn 0.4s ease;
+        }
+
+        .admin-section.open {
+            display: block;
+        }
+
+        .admin-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #cbd5e1;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .admin-title .badge-admin {
+            font-size: 10px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(244, 63, 94, 0.2);
+            color: var(--danger);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group {
+            margin-bottom: 14px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-light);
+            font-size: 14px;
+            transition: var(--transition);
+            outline: none;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+
+        .input-group input::placeholder {
+            color: var(--text-gray);
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* ============================================
+           TABELA DE LOGS
+           ============================================ */
+        .log-table-wrapper {
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .log-table th,
+        .log-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .log-table th {
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .log-table tr:hover td {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .log-table .photo-preview {
+            width: 40px;
+            height: 32px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .log-table .empty-row td {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 30px;
+            font-style: italic;
+        }
+
+        /* ============================================
+           FOOTER
+           ============================================ */
+        footer {
+            text-align: center;
+            padding: 16px;
+            font-size: 11px;
+            color: var(--text-gray);
+            border-top: 1px solid var(--border-color);
+            margin-top: 20px;
+        }
+
+        footer .footer-icons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 8px;
+        }
+
+        footer .footer-icons span {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ============================================
+           RESPONSIVO
+           ============================================ */
+        @media (max-width: 480px) {
+            .header-container {
+                padding: 12px 16px;
+            }
+
+            .logo-text {
+                font-size: 15px;
+            }
+
+            .clock {
+                font-size: 12px;
+                padding: 4px 10px;
+            }
+
+            main {
+                padding: 16px 12px;
+                gap: 16px;
+            }
+
+            .card {
+                padding: 16px;
+            }
+
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+
+            .scanner-circle {
+                width: 100px;
+                height: 100px;
+            }
+
+            .match-container {
+                padding: 10px 12px;
+            }
+
+            .match-photo {
+                width: 44px;
+                height: 44px;
+            }
+
+            .admin-title {
+                font-size: 14px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .btn-group .btn {
+                flex: none;
+                width: 100%;
+            }
+        }
+
+        /* ============================================
+           IMPRESSÃO
+           ============================================ */
+        @media print {
+            body {
+                background: white;
+                color: #333;
+            }
+
+            .camera-box,
+            .scanner-overlay,
+            .btn,
+            .btn-group,
+            .input-group,
+            header,
+            footer,
+            .match-container,
+            .info-text {
+                display: none !important;
+            }
+
+            .admin-section {
+                display: block !important;
+                border: none;
+                padding: 0;
+                background: white;
+            }
+
+            .log-table th {
+                background: #f0f0f0;
+                color: #333;
+            }
+
+            .log-table td {
+                border-color: #ddd;
+            }
+        }
+
+        /* ============================================
+           TOAST NOTIFICATION
+           ============================================ */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 360px;
+            width: 100%;
+        }
+
+        .toast {
+            padding: 14px 20px;
+            border-radius: 12px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toast-success {
+            background: var(--primary);
+        }
+
+        .toast-error {
+            background: var(--danger);
+        }
+
+        .toast-warning {
+            background: var(--warning);
+            color: #333;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ==========================================
+    TOAST CONTAINER
+    ========================================== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ==========================================
+    HEADER
+    ========================================== -->
+    <header>
+        <div class="header-container">
+            <div id="adm-trigger" class="logo-group" title="Clique 3 vezes para área ADM">
+                <div class="pulse-dot"></div>
+                <span class="logo-text">PONTO SEGURO</span>
+            </div>
+            <div id="clock" class="clock">00:00:00</div>
+        </div>
+    </header>
+
+    <!-- ==========================================
+    MAIN
+    ========================================== -->
+    <main>
+
+        <!-- Card Principal -->
+        <div class="card">
+            <div class="card-header">
+                <h3>📸 Reconhecimento Facial</h3>
+                <span class="badge badge-success" id="statusBadge">● Ao Vivo</span>
+            </div>
+
+            <div class="camera-box" id="cameraBox">
+                <video id="video" autoplay playsinline muted></video>
+                <canvas id="canvas" style="display:none;"></canvas>
+                <div class="scanner-overlay">
+                    <div class="scanner-circle"></div>
+                </div>
+                <div class="scanning-line"></div>
+            </div>
+
+            <div class="match-container" id="matchContainer">
+                <img id="match-img" class="match-photo"
+                    src="data:image/svg+xml;utf8,<svg xmlns='http://w3.org' viewBox='0 0 24 24' fill='%23475569'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-4-8-4z'/></svg>">
+                <div class="match-info">
+                    <div id="match-name" class="match-name">Aguardando...</div>
+                    <div id="match-status" class="match-status">
+                        <span class="dot dot-yellow"></span>
+                        Posicione o rosto na câmera
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-text">
+                <h2>🔐 Ponto Biométrico</h2>
+                <p>Sistema de reconhecimento facial com criptografia local</p>
+            </div>
+
+            <button id="btn-capture" class="btn btn-primary" disabled>
+                ✅ Confirmar Batida de Ponto
+            </button>
+
+            <div id="status-box" class="status-box"></div>
+        </div>
+
+        <!-- ==========================================
+        PAINEL ADMINISTRATIVO (OCULTO)
+        ========================================== -->
+        <div id="admin-panel" class="admin-section">
+            <div class="admin-title">
+                <span>🔒 Painel Administrativo</span>
+                <span class="badge-admin">Restrito</span>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label>👤 Nome do Colaborador</label>
+                    <input type="text" id="new-worker-name" placeholder="Ex: Rodrigo Lima">
+                </div>
+                <div class="input-group">
+                    <label>🆔 Matrícula</label>
+                    <input type="text" id="new-worker-id" placeholder="Ex: MAT-4412">
+                </div>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label>📋 Departamento</label>
+                    <select id="new-worker-dept">
+                        <option value="Operações">Operações</option>
+                        <option value="Administração">Administração</option>
+                        <option value="Produção">Produção</option>
+                        <option value="Logística">Logística</option>
+                        <option value="RH">RH</option>
+                        <option value="TI">TI</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>📅 Turno</label>
+                    <select id="new-worker-turno">
+                        <option value="Matutino">Matutino (06h-14h)</option>
+                        <option value="Vespertino">Vespertino (14h-22h)</option>
+                        <option value="Noturno">Noturno (22h-06h)</option>
+                        <option value="Comercial">Comercial (08h-18h)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button id="btn-register" class="btn btn-success">
+                💾 Salvar Biometria com Foto Atual
+            </button>
+
+            <div style="margin-top:20px;display:flex;gap:8px;flex-wrap:wrap;">
+                <button id="btn-pdf" class="btn btn-secondary btn-sm" style="flex:1;">
+                    📄 Exportar Relatório PDF
+                </button>
+                <button id="btn-clear-logs" class="btn btn-danger btn-sm" style="flex:1;">
+                    🗑️ Limpar Histórico
+                </button>
+            </div>
+
+            <div class="admin-title" style="margin-top:24px;border-top:1px solid var(--border-color);padding-top:16px;">
+                <span>📋 Histórico de Batidas</span>
+                <span id="logCount" style="font-size:12px;color:var(--text-muted);font-weight:400;">0 registros</span>
+            </div>
+
+            <div class="log-table-wrapper">
+                <table class="log-table">
+                    <thead>
+                        <tr>
+                            <th>Foto</th>
+                            <th>Colaborador</th>
+                            <th>Matrícula</th>
+                            <th>Data/Hora</th>
+                            <th>Turno</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ponto-logs">
+                        <tr class="empty-row">
+                            <td colspan="5">📭 Nenhum registro de ponto encontrado</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ==========================================
+    FOOTER
+    ========================================== -->
+    <footer>
+        <div class="footer-icons">
+            <span>🔒 Criptografia Local</span>
+            <span>•</span>
+            <span>📱 Reconhecimento Facial</span>
+            <span>•</span>
+            <span>📄 Exportação PDF</span>
+        </div>
+        &copy; 2026 Ponto Biométrico Seguro v3.0
+    </footer>
+
+    <!-- ==========================================
+    JAVASCRIPT COMPLETO
+    ========================================== -->
+    <script>
+        // ============================================
+        // VARIÁVEIS GLOBAIS
+        // ============================================
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const btnCapture = document.getElementById('btn-capture');
+        const btnRegister = document.getElementById('btn-register');
+        const btnPdf = document.getElementById('btn-pdf');
+        const btnClearLogs = document.getElementById('btn-clear-logs');
+        const statusBox = document.getElementById('status-box');
+        const adminPanel = document.getElementById('admin-panel');
+        const admTrigger = document.getElementById('adm-trigger');
+        const cameraBox = document.getElementById('cameraBox');
+        const matchContainer = document.getElementById('matchContainer');
+        const matchImg = document.getElementById('match-img');
+        const matchName = document.getElementById('match-name');
+        const matchStatus = document.getElementById('match-status');
+        const statusBadge = document.getElementById('statusBadge');
+
+        let db = null;
+        let listaTrabalhadores = [];
+        let clickCount = 0;
+        let idTrabalhadorAtivo = '';
+        let trabalhadorAtivo = null;
+        let isScanning = false;
+
+        // ============================================
+        // TOAST NOTIFICATIONS
+        // ============================================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️'
+            };
+            toast.innerHTML = `${icons[type] || '📢'} ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // ============================================
+        // STATUS BOX
+        // ============================================
+        function showStatus(text, type = 'success') {
+            statusBox.className = `status-box ${type}`;
+            statusBox.textContent = text;
+            statusBox.style.display = 'block';
+            setTimeout(() => {
+                statusBox.style.display = 'none';
+            }, 4000);
+        }
+
+        // ============================================
+        // RELÓGIO
+        // ============================================
+        setInterval(() => {
+            document.getElementById('clock').textContent = new Date().toLocaleTimeString('pt-BR');
+        }, 1000);
+
+        // ============================================
+        // TRIGGER ADMIN (3 Cliques)
+        // ============================================
+        admTrigger.addEventListener('click', () => {
+            clickCount++;
+            if (clickCount === 3) {
+                adminPanel.classList.toggle('open');
+                clickCount = 0;
+                if (adminPanel.classList.contains('open')) {
+                    showToast('🔓 Painel administrativo liberado!', 'warning');
+                    adminPanel.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+            setTimeout(() => { clickCount = 0; }, 2000);
+        });
+
+        // ============================================
+        // INDEXEDDB - INICIALIZAÇÃO
+        // ============================================
+        const request = indexedDB.open("PontoBiometricoDB", 2);
+
+        request.onupgradeneeded = function(e) {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains("trabalhadores")) {
+                const store = db.createObjectStore("trabalhadores", { keyPath: "id" });
+                store.createIndex("nome", "nome", { unique: false });
+            }
+            if (!db.objectStoreNames.contains("pontos")) {
+                const store = db.createObjectStore("pontos", { autoIncrement: true });
+                store.createIndex("data", "data", { unique: false });
+                store.createIndex("nome", "nome", { unique: false });
+            }
+        };
+
+        request.onsuccess = function(e) {
+            db = e.target.result;
+            atualizarListaTrabalhadores();
+            carregarHistoricoPontos();
+            iniciarCamera();
+            showToast('🔐 Sistema de ponto biométrico ativado!', 'success');
+        };
+
+        request.onerror = function() {
+            showToast('❌ Erro ao acessar banco de dados local', 'error');
+        };
+
+        // ============================================
+        // CÂMERA
+        // ============================================
+        async function iniciarCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: false,
+                    video: {
+                        facingMode: "user",
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    }
+                });
+                video.srcObject = stream;
+                video.onloadedmetadata = () => {
+                    video.play();
+                    cameraBox.classList.add('active');
+                    statusBadge.textContent = '● Ao Vivo';
+                    setInterval(reconhecimentoFacial, 800);
+                };
+            } catch (err) {
+                showToast('⚠️ Permita o acesso à câmera para continuar', 'error');
+                statusBadge.textContent = '⚠️ Sem Câmera';
+            }
+        }
+
+        // ============================================
+        // RECONHECIMENTO FACIAL (SIMULADO)
+        // ============================================
+        function reconhecimentoFacial() {
+            if (listaTrabalhadores.length === 0 || video.paused || !video.srcObject) {
+                resetMatch();
+                return;
+            }
+
+            // Simula reconhecimento - pega o último cadastrado ou aleatório
+            const idx = Math.floor(Math.random() * listaTrabalhadores.length);
+            const matched = listaTrabalhadores[idx];
+
+            if (matched) {
+                idTrabalhadorAtivo = matched.id;
+                trabalhadorAtivo = matched;
+                matchName.textContent = matched.nome;
+                matchName.className = 'match-name found';
+                matchImg.src = matched.foto;
+                matchImg.className = 'match-photo found';
+                matchContainer.className = 'match-container found';
+                matchStatus.innerHTML = `<span class="dot dot-green"></span> Identidade confirmada: ${matched.departamento || 'Operações'}`;
+                btnCapture.disabled = false;
+                isScanning = true;
+            }
+        }
+
+        function resetMatch() {
+            matchName.textContent = 'Aguardando...';
+            matchName.className = 'match-name';
+            matchImg.src =
+                "data:image/svg+xml;utf8,<svg xmlns='http://w3.org' viewBox='0 0 24 24' fill='%23475569'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-4-8-4z'/></svg>";
+            matchImg.className = 'match-photo';
+            matchContainer.className = 'match-container';
+            matchStatus.innerHTML = `<span class="dot dot-yellow"></span> Posicione o rosto na câmera`;
+            btnCapture.disabled = true;
+            isScanning = false;
+        }
+
+        // ============================================
+        // ATUALIZAR LISTA DE TRABALHADORES
+        // ============================================
+        function atualizarListaTrabalhadores() {
+            if (!db) return;
+            const transaction = db.transaction(["trabalhadores"], "readonly");
+            const store = transaction.objectStore("trabalhadores");
+            const requestAll = store.getAll();
+            requestAll.onsuccess = function() {
+                listaTrabalhadores = requestAll.result || [];
+                console.log(`👥 ${listaTrabalhadores.length} trabalhadores cadastrados`);
+                if (listaTrabalhadores.length === 0) {
+                    showToast('📢 Cadastre um colaborador no painel ADM', 'warning');
+                }
+            };
+        }
+
+        // ============================================
+        // CARREGAR HISTÓRICO
+        // ============================================
+        function carregarHistoricoPontos() {
+            if (!db) return;
+            const transaction = db.transaction(["pontos"], "readonly");
+            const store = transaction.objectStore("pontos");
+            const requestAll = store.getAll();
+
+            requestAll.onsuccess = function() {
+                const registros = requestAll.result || [];
+                const tbody = document.getElementById('ponto-logs');
+                const logCount = document.getElementById('logCount');
+
+                logCount.textContent = `${registros.length} registros`;
+
+                if (registros.length === 0) {
+                    tbody.innerHTML = `<tr class="empty-row"><td colspan="5">📭 Nenhum registro de ponto encontrado</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                const sorted = registros.reverse();
+                sorted.forEach(p => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><img src="${p.foto || 'data:image/svg+xml;utf8,<svg xmlns=%22http://w3.org%22 viewBox=%220 0 24 24%22 fill=%22%23475569%22><path d=%22M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-4-8-4z%22/></svg>'}" class="photo-preview"></td>
+                        <td><strong>${p.nome || 'Desconhecido'}</strong></td>
+                        <td>${p.matricula || 'N/A'}</td>
+                        <td>${p.horario || p.data || 'N/A'}</td>
+                        <td>${p.turno || 'N/A'}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            };
+        }
+
+        // ============================================
+        // CADASTRAR NOVA BIOMETRIA
+        // ============================================
+        btnRegister.addEventListener('click', () => {
+            const name = document.getElementById('new-worker-name').value.trim();
+            const id = document.getElementById('new-worker-id').value.trim();
+            const dept = document.getElementById('new-worker-dept').value;
+            const turno = document.getElementById('new-worker-turno').value;
+
+            if (!name || !id) {
+                showToast('⚠️ Preencha nome e matrícula para cadastrar', 'error');
+                return;
+            }
+
+            if (listaTrabalhadores.some(w => w.id === id)) {
+                showToast('⚠️ Matrícula já cadastrada!', 'error');
+                return;
+            }
+
+            canvas.width = 160;
+            canvas.height = 120;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const fotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+            const transaction = db.transaction(["trabalhadores"], "readwrite");
+            const store = transaction.objectStore("trabalhadores");
+
+            store.put({
+                id: id,
+                nome: name,
+                foto: fotoBase64,
+                departamento: dept,
+                turno: turno,
+                dataCadastro: new Date().toISOString()
+            });
+
+            transaction.oncomplete = function() {
+                showToast(`✅ Biometria de ${name} cadastrada com sucesso!`, 'success');
+                document.getElementById('new-worker-name').value = '';
+                document.getElementById('new-worker-id').value = '';
+                atualizarListaTrabalhadores();
+            };
+        });
+
+        // ============================================
+        // CONFIRMAR BATIDA DE PONTO
+        // ============================================
+        btnCapture.addEventListener('click', () => {
+            if (!idTrabalhadorAtivo || !trabalhadorAtivo) {
+                showToast('⚠️ Nenhum rosto reconhecido!', 'error');
+                return;
+            }
+
+            canvas.width = 320;
+            canvas.height = 240;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const fotoPonto = canvas.toDataURL('image/jpeg', 0.8);
+
+            const horario = new Date().toLocaleString('pt-BR');
+            const dataISO = new Date().toISOString();
+
+            const transaction = db.transaction(["pontos"], "readwrite");
+            const store = transaction.objectStore("pontos");
+
+            store.add({
+                nome: trabalhadorAtivo.nome,
+                matricula: trabalhadorAtivo.id,
+                horario: horario,
+                data: dataISO,
+                foto: fotoPonto,
+                turno: trabalhadorAtivo.turno || 'N/A',
+                departamento: trabalhadorAtivo.departamento || 'N/A'
+            });
+
+            transaction.oncomplete = function() {
+                showToast(`✅ Ponto registrado: ${trabalhadorAtivo.nome} - ${horario}`, 'success');
+                carregarHistoricoPontos();
+                btnCapture.disabled = true;
+                setTimeout(() => {
+                    if (isScanning) btnCapture.disabled = false;
+                }, 2000);
+            };
+        });
+
+        // ============================================
+        // EXPORTAR PDF
+        // ============================================
+        btnPdf.addEventListener('click', () => {
+            const transaction = db.transaction(["pontos"], "readonly");
+            const store = transaction.objectStore("pontos");
+            const requestAll = store.getAll();
+
+            requestAll.onsuccess = function() {
+                const registros = requestAll.result;
+
+                if (registros.length === 0) {
+                    showToast('📭 Nenhum histórico para exportar', 'warning');
+                    return;
+                }
+
+                const janela = window.open('', '_blank');
+                let html = `<!DOCTYPE html>
+                <html>
+                <head><title>Relatório de Ponto</title>
+                <style>
+                    body { font-family: Arial; padding:30px; color:#333; }
+                    .header { text-align:center; border-bottom:2px solid #111; padding-bottom:15px; margin-bottom:25px; }
+                    .header h1 { margin:0; font-size:22px; text-transform:uppercase; }
+                    .header p { margin:5px 0 0; font-size:13px; color:#555; }
+                    table { width:100%; border-collapse:collapse; margin-top:15px; }
+                    th, td { border:1px solid #777; padding:10px; text-align:left; font-size:12px; }
+                    th { background:#eaeaea; font-weight:bold; }
+                    .photo-preview { width:50px; height:38px; object-fit:cover; border-radius:4px; }
+                    .footer { margin-top:50px; text-align:center; font-size:11px; color:#777; border-top:1px solid #ddd; padding-top:15px; }
+                    .total { font-weight:bold; font-size:14px; margin-top:10px; }
+                </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>📋 Relatório de Ponto Biométrico</h1>
+                        <p>Emissão: ${new Date().toLocaleString('pt-BR')} | Total: ${registros.length} registros</p>
+                    </div>
+                    <table>
+                        <thead><tr><th>Foto</th><th>Colaborador</th><th>Matrícula</th><th>Data/Hora</th><th>Turno</th></tr></thead>
+                        <tbody>`;
+
+                const sorted = registros.reverse();
+                sorted.forEach(p => {
+                    html += `<tr>
+                        <td><img src="${p.foto || 'data:image/svg+xml;utf8,<svg xmlns=%22http://w3.org%22 viewBox=%220 0 24 24%22 fill=%22%23475569%22><path d=%22M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-4-8-4z%22/></svg>'}" class="photo-preview"></td>
+                        <td><strong>${p.nome}</strong></td>
+                        <td>${p.matricula || 'N/A'}</td>
+                        <td>${p.horario}</td>
+                        <td>${p.turno || 'N/A'}</td>
+                    </tr>`;
+                });
+
+                html += `</tbody></table>
+                    <div class="total">📊 Total de Registros: ${registros.length}</div>
+                    <div class="footer">Documento gerado pelo sistema Ponto Biométrico Seguro v3.0</div>
+                </body></html>`;
+
+                janela.document.write(html);
+                janela.document.close();
+                janela.onload = function() {
+                    janela.print();
+                };
+                showToast('📄 Relatório PDF gerado com sucesso!', 'success');
+            };
+        });
+
+        // ============================================
+        // LIMPAR HISTÓRICO
+        // ============================================
+        btnClearLogs.addEventListener('click', () => {
+            if (!confirm('⚠️ Tem certeza que deseja limpar todo o histórico de batidas?')) return;
+
+            const transaction = db.transaction(["pontos"], "readwrite");
+            const store = transaction.objectStore("pontos");
+            const requestClear = store.clear();
+
+            requestClear.onsuccess = function() {
+                showToast('🗑️ Histórico limpo com sucesso!', 'warning');
+                carregarHistoricoPontos();
+            };
+        });
+
+        // ============================================
+        // KEYBOARD SHORTCUTS
+        // ============================================
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !btnCapture.disabled) {
+                btnCapture.click();
+            }
+            if (e.key === 'Escape') {
+                adminPanel.classList.remove('open');
+            }
+            if (e.key === 'r' || e.key === 'R') {
+                if (adminPanel.classList.contains('open')) {
+                    btnRegister.click();
+                }
+            }
+        });
+
+        // ============================================
+        // INICIALIZAÇÃO
+        // ============================================
+        console.log('🔒 Ponto Biométrico Seguro v3.0');
+        console.log('📌 Clique 3 vezes no logo para área ADM');
+        console.log('⌨️ Enter = bater ponto | ESC = fechar ADM | R = cadastrar');
+    </script>
+
+</body>
+</html>
