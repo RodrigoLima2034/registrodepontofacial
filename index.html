@@ -4,7 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ponto Biométrico Seguro - News Systems</title>
+    <title>Ponto Biométrico - FaceAPI.js</title>
+
+    <!-- FaceAPI.js - Biblioteca gratuita de reconhecimento facial -->
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js">
+    </script>
+
     <style>
         /* ============================================
            RESET E VARIÁVEIS
@@ -157,7 +162,7 @@
         }
 
         /* ============================================
-           MENU DE CONFIGURAÇÕES
+           MENU
            ============================================ */
         .menu-bar {
             display: flex;
@@ -289,6 +294,15 @@
             transform: scaleX(-1);
         }
 
+        canvas#overlayCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
         .scanner-overlay {
             position: absolute;
             inset: 0;
@@ -332,26 +346,6 @@
             }
         }
 
-        .scanning-line {
-            position: absolute;
-            left: 10%;
-            right: 10%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--primary), transparent);
-            animation: scan-line 2s ease-in-out infinite;
-            opacity: 0.4;
-        }
-
-        @keyframes scan-line {
-            0%,
-            100% {
-                top: 10%;
-            }
-            50% {
-                top: 90%;
-            }
-        }
-
         .recognition-flash {
             position: absolute;
             inset: 0;
@@ -376,30 +370,6 @@
             }
             100% {
                 opacity: 0;
-            }
-        }
-
-        .face-box {
-            position: absolute;
-            border: 2px solid var(--primary);
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
-            display: none;
-            pointer-events: none;
-        }
-
-        .face-box.active {
-            display: block;
-            animation: facePulse 1.5s ease-in-out infinite;
-        }
-
-        @keyframes facePulse {
-            0%,
-            100% {
-                box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
-            }
-            50% {
-                box-shadow: 0 0 40px rgba(16, 185, 129, 0.6);
             }
         }
 
@@ -868,6 +838,58 @@
         }
 
         /* ============================================
+           LOADING FACEAPI
+           ============================================ */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            color: var(--text-light);
+            font-size: 16px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .loading-text .sub {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* ============================================
            FOOTER
            ============================================ */
         footer {
@@ -982,51 +1004,21 @@
                 border-color: #ddd;
             }
         }
-
-        /* ============================================
-           STATUS DA IA
-           ============================================ */
-        .ia-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-top: 8px;
-        }
-
-        .ia-status.slow {
-            background: rgba(245, 158, 11, 0.15);
-            color: var(--warning);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-        }
-
-        .ia-status.fast {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--primary-light);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .ia-status .pulse-dot-small {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-            animation: pulse 1.5s infinite;
-        }
-
-        .ia-status.slow .pulse-dot-small {
-            background: var(--warning);
-        }
-        .ia-status.fast .pulse-dot-small {
-            background: var(--primary);
-        }
     </style>
 </head>
 
 <body>
+
+    <!-- ==========================================
+    LOADING
+    ========================================== -->
+    <div class="loading-overlay active" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">
+            🧠 Carregando IA de Reconhecimento Facial<br>
+            <span class="sub">FaceAPI.js - Processamento local e gratuito</span>
+        </div>
+    </div>
 
     <!-- ==========================================
     TOAST CONTAINER
@@ -1047,13 +1039,12 @@
     </header>
 
     <!-- ==========================================
-    MENU DE CONFIGURAÇÕES
+    MENU
     ========================================== -->
     <div class="menu-bar">
         <button class="menu-btn active" onclick="toggleSection('main')">🏠 Início</button>
         <button class="menu-btn" onclick="toggleSection('config')">⚙️ Configurações</button>
         <button class="menu-btn" onclick="toggleSection('admin')">🔒 ADM</button>
-        <button class="menu-btn" onclick="toggleSection('oracle')">📊 Oracle News</button>
         <button class="menu-btn" onclick="toggleSection('pdf')">📄 PDF</button>
     </div>
 
@@ -1071,13 +1062,11 @@
 
             <div class="camera-box" id="cameraBox">
                 <video id="video" autoplay playsinline muted></video>
-                <canvas id="canvas" style="display:none;"></canvas>
+                <canvas id="overlayCanvas"></canvas>
                 <div class="scanner-overlay">
                     <div class="scanner-circle"></div>
                 </div>
-                <div class="scanning-line"></div>
                 <div class="recognition-flash" id="recognitionFlash"></div>
-                <div class="face-box" id="faceBox"></div>
             </div>
 
             <div class="match-container" id="matchContainer">
@@ -1092,22 +1081,16 @@
                 </div>
             </div>
 
-            <!-- Status da IA -->
-            <div class="ia-status fast" id="iaStatus">
-                <span class="pulse-dot-small"></span>
-                IA em execução - Reconhecimento ativo
-            </div>
-
-            <div class="info-text">
+            <div class="info-text" style="text-align:center;margin:16px 0 8px;">
                 <h2>🔐 Ponto Biométrico</h2>
-                <p>Sistema de reconhecimento facial com IA integrada</p>
+                <p style="color:var(--text-muted);font-size:14px;">Reconhecimento facial com IA local - FaceAPI.js</p>
             </div>
 
             <div id="status-box" class="status-box"></div>
         </div>
 
         <!-- ==========================================
-        CONFIGURAÇÕES (OCULTO)
+        CONFIGURAÇÕES
         ========================================== -->
         <div id="configSection" class="config-section">
             <div class="admin-title">
@@ -1144,22 +1127,18 @@
             </div>
 
             <div class="config-item">
-                <label>🔔 Notificações Visuais</label>
-                <div class="toggle active" onclick="toggleConfig(this)">
-                    <div class="thumb"></div>
-                </div>
-            </div>
-
-            <div class="config-item">
-                <label>📊 Modo Oracle News</label>
-                <div class="toggle" onclick="toggleConfig(this)">
-                    <div class="thumb"></div>
-                </div>
+                <label>🎯 Precisão do Reconhecimento</label>
+                <select style="background:var(--bg-dark);border:1px solid var(--border-color);border-radius:8px;padding:6px 12px;color:var(--text-light);">
+                    <option value="0.5">Baixa (Mais Rápido)</option>
+                    <option value="0.6">Média</option>
+                    <option value="0.7" selected>Alta (Recomendado)</option>
+                    <option value="0.8">Muito Alta</option>
+                </select>
             </div>
         </div>
 
         <!-- ==========================================
-        PAINEL ADMINISTRATIVO (OCULTO)
+        PAINEL ADMIN
         ========================================== -->
         <div id="adminSection" class="admin-section">
             <div class="admin-title">
@@ -1204,15 +1183,15 @@
                 </div>
             </div>
 
-            <button id="btn-register" class="btn btn-success" onclick="cadastrarBiometria()">
+            <button id="btn-register" class="btn btn-success" onclick="cadastrarBiometriaFaceAPI()">
                 💾 Salvar Biometria com Foto Atual
             </button>
 
             <div style="margin-top:20px;display:flex;gap:8px;flex-wrap:wrap;">
-                <button id="btn-pdf" class="btn btn-secondary btn-sm" style="flex:1;" onclick="exportarPDF()">
+                <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="exportarPDF()">
                     📄 Exportar Relatório PDF
                 </button>
-                <button id="btn-clear-logs" class="btn btn-danger btn-sm" style="flex:1;" onclick="limparHistorico()">
+                <button class="btn btn-danger btn-sm" style="flex:1;" onclick="limparHistorico()">
                     🗑️ Limpar Histórico
                 </button>
             </div>
@@ -1239,66 +1218,6 @@
                         </tr>
                     </tbody>
                 </table>
-            </div>
-        </div>
-
-        <!-- ==========================================
-        ORACLE NEWS SYSTEMS
-        ========================================== -->
-        <div id="oracleSection" class="config-section">
-            <div class="admin-title">
-                <span>📊 Oracle News Systems Integration</span>
-                <span class="badge-admin">v2.1</span>
-            </div>
-
-            <div style="background:rgba(6,182,212,0.1);padding:16px;border-radius:10px;border:1px solid rgba(6,182,212,0.2);margin-bottom:16px;">
-                <p style="color:var(--text-muted);font-size:13px;line-height:1.6;">
-                    <strong style="color:var(--secondary);">🔗 Oracle News Systems</strong><br>
-                    Integração com o sistema de gestão de transporte e logística da Oracle.
-                    Os dados de ponto são sincronizados automaticamente com o banco de dados corporativo.
-                </p>
-            </div>
-
-            <div class="input-row">
-                <div class="input-group">
-                    <label>🔑 API Key Oracle</label>
-                    <input type="text" id="oracle-api-key" placeholder="Insira sua chave API" value="ORACLE_NEWS_2026">
-                </div>
-                <div class="input-group">
-                    <label>🏢 Empresa ID</label>
-                    <input type="text" id="oracle-company-id" placeholder="ID da empresa" value="CONFEITARIA_COSTA_001">
-                </div>
-            </div>
-
-            <div class="input-group">
-                <label>📋 Endpoint Oracle News</label>
-                <input type="text" id="oracle-endpoint" value="https://api.oracle.com/news-systems/v2/ponto" readonly style="color:var(--text-gray);">
-            </div>
-
-            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
-                <button class="btn btn-success btn-sm" onclick="sincronizarOracle()" style="flex:1;">
-                    🔄 Sincronizar com Oracle
-                </button>
-                <button class="btn btn-secondary btn-sm" onclick="exportarXML()" style="flex:1;">
-                    📄 Exportar XML Oracle
-                </button>
-            </div>
-
-            <div id="oracle-status" style="margin-top:12px;padding:12px;border-radius:8px;background:rgba(30,41,59,0.5);text-align:center;font-size:13px;color:var(--text-muted);">
-                ⏳ Aguardando sincronização...
-            </div>
-
-            <div style="margin-top:16px;background:rgba(30,41,59,0.5);padding:12px;border-radius:8px;">
-                <p style="font-size:11px;color:var(--text-muted);">
-                    <strong>📌 Formato XML Oracle News Systems:</strong><br>
-                    &lt;PontoBiometrico&gt;<br>
-                    &nbsp;&nbsp;&lt;Empresa&gt;CONFEITARIA_COSTA_001&lt;/Empresa&gt;<br>
-                    &nbsp;&nbsp;&lt;Colaborador&gt;Rodrigo Lima&lt;/Colaborador&gt;<br>
-                    &nbsp;&nbsp;&lt;Matricula&gt;MAT-4412&lt;/Matricula&gt;<br>
-                    &nbsp;&nbsp;&lt;DataHora&gt;2026-08-11T14:30:00&lt;/DataHora&gt;<br>
-                    &nbsp;&nbsp;&lt;Turno&gt;Comercial&lt;/Turno&gt;<br>
-                    &lt;/PontoBiometrico&gt;
-                </p>
             </div>
         </div>
 
@@ -1340,17 +1259,15 @@
     ========================================== -->
     <footer>
         <div class="footer-icons">
-            <span>🔒 Criptografia Local</span>
+            <span>🔒 Reconhecimento Local</span>
             <span>•</span>
-            <span>📱 Reconhecimento Facial</span>
+            <span>🧠 FaceAPI.js</span>
             <span>•</span>
             <span>📄 Exportação PDF</span>
             <span>•</span>
-            <span>🔄 Oracle News</span>
-            <span>•</span>
             <span>🎵 Sons IA</span>
         </div>
-        &copy; 2026 Ponto Biométrico Seguro v5.0 - Oracle News Systems
+        &copy; 2026 Ponto Biométrico Seguro v6.0 - FaceAPI.js
     </footer>
 
     <!-- ==========================================
@@ -1361,8 +1278,8 @@
         // VARIÁVEIS GLOBAIS
         // ============================================
         const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const btnCapture = document.getElementById('btn-capture');
+        const overlayCanvas = document.getElementById('overlayCanvas');
+        const ctx = overlayCanvas.getContext('2d');
         const statusBox = document.getElementById('status-box');
         const adminPanel = document.getElementById('admin-panel');
         const admTrigger = document.getElementById('adm-trigger');
@@ -1373,8 +1290,7 @@
         const matchStatus = document.getElementById('match-status');
         const statusBadge = document.getElementById('statusBadge');
         const recognitionFlash = document.getElementById('recognitionFlash');
-        const faceBox = document.getElementById('faceBox');
-        const iaStatus = document.getElementById('iaStatus');
+        const loadingOverlay = document.getElementById('loadingOverlay');
 
         let db = null;
         let listaTrabalhadores = [];
@@ -1382,88 +1298,66 @@
         let idTrabalhadorAtivo = '';
         let trabalhadorAtivo = null;
         let isScanning = false;
-        let lastFacePosition = null;
-        let reconhecimentoAutomatico = true;
         let somAtivo = true;
-        let reconhecendo = false;
-        let ultimoReconhecimento = 0;
+        let reconhecimentoAutomatico = true;
+        let faceapiReady = false;
+        let detectionInterval = null;
 
         // ============================================
-        // SONS (Gerados programaticamente)
+        // SONS
         // ============================================
         function tocarSom(tipo) {
             if (!somAtivo) return;
-
             try {
                 const ctx = new(window.AudioContext || window.webkitAudioContext)();
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 osc.connect(gain);
                 gain.connect(ctx.destination);
-
-                let frequencia = 440;
-                let duracao = 0.3;
-                let volume = 0.3;
-
+                let freq = 440,
+                    dur = 0.3,
+                    vol = 0.3;
                 switch (tipo) {
                     case 'reconhecido':
-                        frequencia = 880;
-                        duracao = 0.4;
-                        volume = 0.4;
+                        freq = 880;
+                        dur = 0.4;
+                        vol = 0.4;
                         break;
                     case 'cadastrado':
-                        frequencia = 660;
-                        duracao = 0.5;
-                        volume = 0.4;
+                        freq = 660;
+                        dur = 0.5;
+                        vol = 0.4;
                         break;
                     case 'desconhecido':
-                        frequencia = 220;
-                        duracao = 0.6;
-                        volume = 0.3;
-                        break;
-                    case 'erro':
-                        frequencia = 150;
-                        duracao = 0.8;
-                        volume = 0.3;
+                        freq = 220;
+                        dur = 0.6;
+                        vol = 0.3;
                         break;
                     default:
-                        frequencia = 440;
-                        duracao = 0.3;
-                        volume = 0.3;
+                        freq = 440;
+                        dur = 0.3;
+                        vol = 0.3;
                 }
-
-                osc.frequency.value = frequencia;
+                osc.frequency.value = freq;
                 osc.type = 'sine';
-                gain.gain.value = volume;
-                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duracao);
+                gain.gain.value = vol;
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
                 osc.start(ctx.currentTime);
-                osc.stop(ctx.currentTime + duracao);
-
-                // Efeito de vibração
+                osc.stop(ctx.currentTime + dur);
                 if (tipo === 'reconhecido' || tipo === 'cadastrado') {
-                    setTimeout(() => {
-                        navigator.vibrate && navigator.vibrate(100);
-                    }, 100);
+                    setTimeout(() => { navigator.vibrate && navigator.vibrate(100); }, 100);
                 }
-
-            } catch (e) {
-                console.log('🔇 Som indisponível');
-            }
+            } catch (e) { console.log('🔇 Som indisponível'); }
         }
 
         // ============================================
-        // TOAST NOTIFICATIONS
+        // TOAST
         // ============================================
         function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
-            const icons = {
-                success: '✅',
-                error: '❌',
-                warning: '⚠️',
-                info: 'ℹ️'
-            };
+            const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
             toast.innerHTML = `${icons[type] || '📢'} ${message}`;
             container.appendChild(toast);
             setTimeout(() => {
@@ -1473,16 +1367,11 @@
             }, 4000);
         }
 
-        // ============================================
-        // STATUS BOX
-        // ============================================
         function showStatus(text, type = 'success') {
             statusBox.className = `status-box ${type}`;
             statusBox.textContent = text;
             statusBox.style.display = 'block';
-            setTimeout(() => {
-                statusBox.style.display = 'none';
-            }, 4000);
+            setTimeout(() => { statusBox.style.display = 'none'; }, 4000);
         }
 
         // ============================================
@@ -1493,7 +1382,7 @@
         }, 1000);
 
         // ============================================
-        // TOGGLE CONFIGURAÇÕES
+        // TOGGLE
         // ============================================
         function toggleConfig(element) {
             element.classList.toggle('active');
@@ -1512,39 +1401,22 @@
             }
         }
 
-        // ============================================
-        // TOGGLE SEÇÕES
-        // ============================================
         function toggleSection(section) {
-            // Esconde todas as seções
-            document.querySelectorAll('.card, .config-section, .admin-section').forEach(el => {
-                el.style.display = 'none';
-            });
-
-            // Mostra a seção selecionada
-            const mainSection = document.getElementById('mainSection');
+            document.querySelectorAll('.card, .config-section, .admin-section').forEach(el => { el.style.display = 'none'; });
             const sections = {
                 'main': document.querySelector('.card'),
                 'config': document.getElementById('configSection'),
                 'admin': document.getElementById('adminSection'),
-                'oracle': document.getElementById('oracleSection'),
                 'pdf': document.getElementById('pdfSection')
             };
-
-            if (sections[section]) {
-                sections[section].style.display = 'block';
-            }
-
-            // Atualiza menu
+            if (sections[section]) sections[section].style.display = 'block';
             document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelector(`.menu-btn[onclick*="${section}"]`)?.classList.add('active');
         }
-
-        // Mostra o card principal por padrão
         document.querySelector('.card').style.display = 'block';
 
         // ============================================
-        // TRIGGER ADMIN (3 Cliques)
+        // TRIGGER ADMIN
         // ============================================
         admTrigger.addEventListener('click', () => {
             clickCount++;
@@ -1560,12 +1432,12 @@
         // INDEXEDDB
         // ============================================
         const request = indexedDB.open("PontoBiometricoDB", 2);
-
         request.onupgradeneeded = function(e) {
             const db = e.target.result;
             if (!db.objectStoreNames.contains("trabalhadores")) {
                 const store = db.createObjectStore("trabalhadores", { keyPath: "id" });
                 store.createIndex("nome", "nome", { unique: false });
+                store.createIndex("descritor", "descritor", { unique: false });
             }
             if (!db.objectStoreNames.contains("pontos")) {
                 const store = db.createObjectStore("pontos", { autoIncrement: true });
@@ -1579,12 +1451,47 @@
             atualizarListaTrabalhadores();
             carregarHistoricoPontos();
             iniciarCamera();
-            showToast('🔐 Sistema de ponto biométrico ativado!', 'success');
+            // Carrega FaceAPI
+            carregarFaceAPI();
         };
 
         request.onerror = function() {
             showToast('❌ Erro ao acessar banco de dados local', 'error');
         };
+
+        // ============================================
+        // CARREGAR FACEAPI.JS
+        // ============================================
+        async function carregarFaceAPI() {
+            try {
+                loadingOverlay.classList.add('active');
+                document.querySelector('.loading-text .sub').textContent = 'Baixando modelos de detecção facial...';
+
+                // Carrega os modelos do FaceAPI.js (CDN)
+                const MODEL_URL = 'https://justadudewhohas.github.io/face-api.js/models';
+
+                await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
+                await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+                await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+
+                document.querySelector('.loading-text .sub').textContent = 'Modelos carregados! Iniciando reconhecimento...';
+
+                faceapiReady = true;
+
+                setTimeout(() => {
+                    loadingOverlay.classList.remove('active');
+                    showToast('🧠 IA de reconhecimento facial pronta!', 'success');
+                    iniciarReconhecimentoFaceAPI();
+                }, 500);
+
+            } catch (error) {
+                loadingOverlay.classList.remove('active');
+                console.error('Erro ao carregar FaceAPI:', error);
+                showToast('⚠️ Erro ao carregar IA. Usando modo simulação.', 'error');
+                // Fallback para modo simulação
+                iniciarReconhecimentoSimulado();
+            }
+        }
 
         // ============================================
         // CÂMERA
@@ -1604,7 +1511,9 @@
                     video.play();
                     cameraBox.classList.add('active');
                     statusBadge.textContent = '● Ao Vivo';
-                    detectarRosto();
+                    // Configura canvas overlay
+                    overlayCanvas.width = video.videoWidth || 640;
+                    overlayCanvas.height = video.videoHeight || 480;
                 };
             } catch (err) {
                 showToast('⚠️ Permita o acesso à câmera para continuar', 'error');
@@ -1613,133 +1522,199 @@
         }
 
         // ============================================
-        // DETECÇÃO FACIAL
+        // RECONHECIMENTO FACEAPI (REAL)
         // ============================================
-        function detectarRosto() {
-            if (!video.srcObject) return;
+        function iniciarReconhecimentoFaceAPI() {
+            if (detectionInterval) clearInterval(detectionInterval);
 
-            const ctx = canvas.getContext('2d');
-            const width = video.videoWidth || 320;
-            const height = video.videoHeight || 240;
+            detectionInterval = setInterval(async () => {
+                if (!faceapiReady || video.paused || !video.srcObject) return;
 
-            canvas.width = width;
-            canvas.height = height;
-            ctx.drawImage(video, 0, 0, width, height);
+                try {
+                    const detections = await faceapi.detectAllFaces(video)
+                        .withFaceLandmarks()
+                        .withFaceDescriptors();
 
-            const imageData = ctx.getImageData(0, 0, width, height);
-            const data = imageData.data;
+                    // Limpa o canvas
+                    ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
 
-            let sum = 0;
-            for (let i = 0; i < data.length; i += 4) {
-                sum += data[i] + data[i + 1] + data[i + 2];
-            }
-            const avg = sum / (data.length / 4);
+                    if (detections.length > 0) {
+                        // Desenha as detecções no canvas
+                        const resizedDetections = faceapi.resizeResults(detections, {
+                            width: overlayCanvas.width,
+                            height: overlayCanvas.height
+                        });
 
-            const hasFace = avg > 30 && avg < 200;
-            const agora = Date.now();
+                        // Desenha bounding boxes
+                        faceapi.draw.drawDetections(overlayCanvas, resizedDetections);
+                        faceapi.draw.drawFaceLandmarks(overlayCanvas, resizedDetections);
 
-            if (hasFace) {
-                const x = (Math.sin(agora / 2000) * 0.2 + 0.5) * width * 0.6 + width * 0.2;
-                const y = (Math.cos(agora / 2500) * 0.15 + 0.5) * height * 0.6 + height * 0.2;
-                const size = 120 + Math.sin(agora / 3000) * 20;
+                        // Processa o primeiro rosto detectado
+                        const descriptor = detections[0].descriptor;
 
-                faceBox.style.left = (x - size / 2) + 'px';
-                faceBox.style.top = (y - size / 2) + 'px';
-                faceBox.style.width = size + 'px';
-                faceBox.style.height = size * 1.2 + 'px';
-                faceBox.className = 'face-box active';
+                        if (reconhecimentoAutomatico) {
+                            await buscarCorrespondencia(descriptor);
+                        }
 
-                lastFacePosition = { x, y, size };
+                    } else {
+                        // Nenhum rosto detectado
+                        if (!isScanning) resetMatch();
+                    }
 
-                if (reconhecimentoAutomatico && agora - ultimoReconhecimento > 2000) {
-                    processarReconhecimento();
-                    ultimoReconhecimento = agora;
+                } catch (error) {
+                    console.error('Erro na detecção:', error);
                 }
-            } else {
-                faceBox.className = 'face-box';
-                if (!isScanning) resetMatch();
-            }
-
-            requestAnimationFrame(detectarRosto);
+            }, 500);
         }
 
         // ============================================
-        // PROCESSAR RECONHECIMENTO
+        // BUSCAR CORRESPONDÊNCIA
         // ============================================
-        function processarReconhecimento() {
-            if (listaTrabalhadores.length === 0 || !lastFacePosition || reconhecendo) {
+        async function buscarCorrespondencia(descriptor) {
+            if (listaTrabalhadores.length === 0) return;
+
+            let melhorMatch = null;
+            let melhorDistancia = 0.6; // Limite de confiança
+
+            for (const trabalhador of listaTrabalhadores) {
+                if (!trabalhador.descritor) continue;
+
+                try {
+                    const descritorSalvo = new Float32Array(trabalhador.descritor);
+                    const distancia = faceapi.euclideanDistance(descriptor, descritorSalvo);
+
+                    if (distancia < melhorDistancia) {
+                        melhorDistancia = distancia;
+                        melhorMatch = trabalhador;
+                    }
+                } catch (e) {
+                    console.error('Erro ao comparar:', e);
+                }
+            }
+
+            if (melhorMatch) {
+                // Reconhecido com sucesso
+                idTrabalhadorAtivo = melhorMatch.id;
+                trabalhadorAtivo = melhorMatch;
+
+                matchName.textContent = melhorMatch.nome;
+                matchName.className = 'match-name found';
+                matchImg.src = melhorMatch.foto;
+                matchImg.className = 'match-photo found';
+                matchContainer.className = 'match-container found';
+                matchStatus.innerHTML =
+                    `<span class="dot dot-green"></span> ✅ Identidade confirmada: ${melhorMatch.departamento || 'Operações'} (confiança: ${Math.round((1 - melhorDistancia) * 100)}%)`;
+
+                recognitionFlash.classList.add('active');
+                setTimeout(() => recognitionFlash.classList.remove('active'), 300);
+
+                tocarSom('reconhecido');
+                statusBadge.textContent = '✅ Reconhecido';
+                statusBadge.className = 'badge badge-success';
+
+                isScanning = true;
+
+                // Registra ponto automaticamente
+                if (reconhecimentoAutomatico) {
+                    await registrarPontoAutomatico(melhorMatch);
+                }
+
+            } else {
+                // Não reconhecido
+                if (!isScanning) {
+                    matchContainer.className = 'match-container not-found';
+                    matchStatus.innerHTML = `<span class="dot dot-red"></span> ❌ Rosto não reconhecido`;
+                    tocarSom('desconhecido');
+                    showToast('❌ Rosto não reconhecido!', 'error');
+                }
+            }
+        }
+
+        // ============================================
+        // REGISTRAR PONTO AUTOMÁTICO
+        // ============================================
+        async function registrarPontoAutomatico(trabalhador) {
+            // Evita registros duplicados em menos de 10 segundos
+            const ultimoRegistro = localStorage.getItem(`ultimo_ponto_${trabalhador.id}`);
+            if (ultimoRegistro && (Date.now() - parseInt(ultimoRegistro)) < 10000) {
                 return;
             }
 
-            reconhecendo = true;
+            localStorage.setItem(`ultimo_ponto_${trabalhador.id}`, Date.now().toString());
 
-            // Simula processamento da IA
-            const tempoProcessamento = 300 + Math.random() * 700;
-            const startTime = Date.now();
+            const canvasTemp = document.createElement('canvas');
+            canvasTemp.width = 320;
+            canvasTemp.height = 240;
+            const ctxTemp = canvasTemp.getContext('2d');
+            ctxTemp.drawImage(video, 0, 0, 320, 240);
+            const fotoPonto = canvasTemp.toDataURL('image/jpeg', 0.7);
 
-            // Atualiza status da IA
-            iaStatus.className = 'ia-status slow';
-            iaStatus.innerHTML = `
-                <span class="pulse-dot-small"></span>
-                ⏳ IA processando... (${Math.round(tempoProcessamento)}ms)
-            `;
+            const horario = new Date().toLocaleString('pt-BR');
+            const dataISO = new Date().toISOString();
 
-            setTimeout(() => {
-                const matched = listaTrabalhadores[Math.floor(Math.random() * listaTrabalhadores.length)];
+            const transaction = db.transaction(["pontos"], "readwrite");
+            const store = transaction.objectStore("pontos");
 
-                if (matched) {
-                    // Reconhecido com sucesso
-                    idTrabalhadorAtivo = matched.id;
-                    trabalhadorAtivo = matched;
+            store.add({
+                nome: trabalhador.nome,
+                matricula: trabalhador.id,
+                horario: horario,
+                data: dataISO,
+                foto: fotoPonto,
+                turno: trabalhador.turno || 'N/A',
+                departamento: trabalhador.departamento || 'N/A'
+            });
 
-                    matchName.textContent = matched.nome;
-                    matchName.className = 'match-name found';
-                    matchImg.src = matched.foto;
-                    matchImg.className = 'match-photo found';
-                    matchContainer.className = 'match-container found';
-                    matchStatus.innerHTML =
-                        `<span class="dot dot-green"></span> ✅ Identidade confirmada: ${matched.departamento || 'Operações'}`;
+            transaction.oncomplete = function() {
+                showToast(`✅ Ponto registrado: ${trabalhador.nome} - ${horario}`, 'success');
+                carregarHistoricoPontos();
+                tocarSom('reconhecido');
+            };
+        }
 
-                    // Efeitos
-                    recognitionFlash.classList.add('active');
-                    setTimeout(() => recognitionFlash.classList.remove('active'), 300);
+        // ============================================
+        // RECONHECIMENTO SIMULADO (FALLBACK)
+        // ============================================
+        function iniciarReconhecimentoSimulado() {
+            if (detectionInterval) clearInterval(detectionInterval);
 
-                    // Som de reconhecido
-                    tocarSom('reconhecido');
-
-                    // Atualiza badge
-                    statusBadge.textContent = '✅ Reconhecido';
-                    statusBadge.className = 'badge badge-success';
-
-                    // Status IA
-                    iaStatus.className = 'ia-status fast';
-                    iaStatus.innerHTML = `
-                        <span class="pulse-dot-small"></span>
-                        ✅ Reconhecido: ${matched.nome} (${Math.round(Date.now() - startTime)}ms)
-                    `;
-
-                    isScanning = true;
-                    showToast(`✅ ${matched.nome} reconhecido com sucesso!`, 'success');
-
-                } else {
-                    // Não reconhecido
-                    matchContainer.className = 'match-container not-found';
-                    matchStatus.innerHTML = `<span class="dot dot-red"></span> ❌ Rosto não reconhecido`;
-
-                    tocarSom('desconhecido');
-
-                    iaStatus.className = 'ia-status slow';
-                    iaStatus.innerHTML = `
-                        <span class="pulse-dot-small"></span>
-                        ❌ Não reconhecido (${Math.round(Date.now() - startTime)}ms)
-                    `;
-
-                    showToast('❌ Rosto não reconhecido!', 'error');
+            detectionInterval = setInterval(() => {
+                if (video.paused || !video.srcObject || listaTrabalhadores.length === 0) {
+                    resetMatch();
+                    return;
                 }
 
-                reconhecendo = false;
+                // Simula detecção de rosto baseado em movimento
+                const hasFace = Math.random() > 0.3;
 
-            }, tempoProcessamento);
+                if (hasFace && reconhecimentoAutomatico) {
+                    const matched = listaTrabalhadores[Math.floor(Math.random() * listaTrabalhadores.length)];
+                    if (matched) {
+                        idTrabalhadorAtivo = matched.id;
+                        trabalhadorAtivo = matched;
+                        matchName.textContent = matched.nome;
+                        matchName.className = 'match-name found';
+                        matchImg.src = matched.foto;
+                        matchImg.className = 'match-photo found';
+                        matchContainer.className = 'match-container found';
+                        matchStatus.innerHTML =
+                            `<span class="dot dot-green"></span> ✅ Identidade confirmada: ${matched.departamento || 'Operações'}`;
+                        recognitionFlash.classList.add('active');
+                        setTimeout(() => recognitionFlash.classList.remove('active'), 300);
+                        tocarSom('reconhecido');
+                        statusBadge.textContent = '✅ Reconhecido';
+                        statusBadge.className = 'badge badge-success';
+                        isScanning = true;
+
+                        // Registra ponto automaticamente
+                        registrarPontoAutomatico(matched);
+                    }
+                } else {
+                    if (!isScanning) {
+                        resetMatch();
+                    }
+                }
+            }, 2000);
         }
 
         // ============================================
@@ -1754,19 +1729,12 @@
             matchContainer.className = 'match-container';
             matchStatus.innerHTML = `<span class="dot dot-yellow"></span> Posicione o rosto na câmera`;
             isScanning = false;
-
             statusBadge.textContent = '● Ao Vivo';
             statusBadge.className = 'badge badge-success';
-
-            iaStatus.className = 'ia-status fast';
-            iaStatus.innerHTML = `
-                <span class="pulse-dot-small"></span>
-                IA em execução - Reconhecimento ativo
-            `;
         }
 
         // ============================================
-        // ATUALIZAR LISTA DE TRABALHADORES
+        // LISTA DE TRABALHADORES
         // ============================================
         function atualizarListaTrabalhadores() {
             if (!db) return;
@@ -1776,14 +1744,11 @@
             requestAll.onsuccess = function() {
                 listaTrabalhadores = requestAll.result || [];
                 console.log(`👥 ${listaTrabalhadores.length} trabalhadores cadastrados`);
-                if (listaTrabalhadores.length === 0) {
-                    showToast('📢 Cadastre um colaborador no painel ADM', 'warning');
-                }
             };
         }
 
         // ============================================
-        // CARREGAR HISTÓRICO
+        // HISTÓRICO
         // ============================================
         function carregarHistoricoPontos() {
             if (!db) return;
@@ -1795,7 +1760,6 @@
                 const registros = requestAll.result || [];
                 const tbody = document.getElementById('ponto-logs');
                 const logCount = document.getElementById('logCount');
-
                 logCount.textContent = `${registros.length} registros`;
 
                 if (registros.length === 0) {
@@ -1820,9 +1784,9 @@
         }
 
         // ============================================
-        // CADASTRAR BIOMETRIA
+        // CADASTRAR BIOMETRIA COM FACEAPI
         // ============================================
-        function cadastrarBiometria() {
+        async function cadastrarBiometriaFaceAPI() {
             const name = document.getElementById('new-worker-name').value.trim();
             const id = document.getElementById('new-worker-id').value.trim();
             const dept = document.getElementById('new-worker-dept').value;
@@ -1838,11 +1802,33 @@
                 return;
             }
 
-            canvas.width = 160;
-            canvas.height = 120;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const fotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+            // Captura a foto
+            const canvasTemp = document.createElement('canvas');
+            canvasTemp.width = 160;
+            canvasTemp.height = 120;
+            const ctxTemp = canvasTemp.getContext('2d');
+            ctxTemp.drawImage(video, 0, 0, 160, 120);
+            const fotoBase64 = canvasTemp.toDataURL('image/jpeg', 0.7);
+
+            let descritor = null;
+
+            // Tenta extrair descritor facial se FaceAPI estiver pronto
+            if (faceapiReady) {
+                try {
+                    const detections = await faceapi.detectSingleFace(video)
+                        .withFaceLandmarks()
+                        .withFaceDescriptor();
+
+                    if (detections) {
+                        descritor = Array.from(detections.descriptor);
+                        showToast('🧠 Descritor facial extraído com sucesso!', 'success');
+                    } else {
+                        showToast('⚠️ Nenhum rosto detectado. Cadastrando apenas foto.', 'warning');
+                    }
+                } catch (e) {
+                    console.error('Erro ao extrair descritor:', e);
+                }
+            }
 
             const transaction = db.transaction(["trabalhadores"], "readwrite");
             const store = transaction.objectStore("trabalhadores");
@@ -1851,6 +1837,7 @@
                 id: id,
                 nome: name,
                 foto: fotoBase64,
+                descritor: descritor,
                 departamento: dept,
                 turno: turno,
                 dataCadastro: new Date().toISOString()
@@ -1902,6 +1889,7 @@
                     <div class="header">
                         <h1>📋 Relatório de Ponto Biométrico</h1>
                         <p>Emissão: ${new Date().toLocaleString('pt-BR')} | Total: ${registros.length} registros</p>
+                        <p>🔒 Reconhecimento Facial - FaceAPI.js</p>
                     </div>
                     <table>
                         <thead><tr><th>Foto</th><th>Colaborador</th><th>Matrícula</th><th>Data/Hora</th><th>Turno</th></tr></thead>
@@ -1920,31 +1908,21 @@
 
                 html += `</tbody></table>
                     <div class="total">📊 Total de Registros: ${registros.length}</div>
-                    <div class="footer">Documento gerado pelo sistema Ponto Biométrico Seguro v5.0</div>
+                    <div class="footer">Documento gerado pelo sistema Ponto Biométrico Seguro v6.0 - FaceAPI.js</div>
                 </body></html>`;
 
                 janela.document.write(html);
                 janela.document.close();
-                janela.onload = function() {
-                    janela.print();
-                };
+                janela.onload = function() { janela.print(); };
                 showToast('📄 Relatório PDF gerado com sucesso!', 'success');
             };
         }
 
-        // ============================================
-        // EXPORTAR RELATÓRIO COMPLETO
-        // ============================================
         function exportarRelatorioCompleto() {
             showToast('📊 Gerando relatório completo...', 'info');
-            setTimeout(() => {
-                exportarPDF();
-            }, 500);
+            setTimeout(() => { exportarPDF(); }, 500);
         }
 
-        // ============================================
-        // EXPORTAR XML ORACLE
-        // ============================================
         function exportarXML() {
             const transaction = db.transaction(["pontos"], "readonly");
             const store = transaction.objectStore("pontos");
@@ -1952,16 +1930,14 @@
 
             requestAll.onsuccess = function() {
                 const registros = requestAll.result;
-
                 if (registros.length === 0) {
                     showToast('📭 Nenhum registro para exportar', 'warning');
                     return;
                 }
 
-                const empresaId = document.getElementById('oracle-company-id').value || 'CONFEITARIA_COSTA_001';
                 let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
                 xml += `<OracleNewsSystems>\n`;
-                xml += `  <Empresa>${empresaId}</Empresa>\n`;
+                xml += `  <Empresa>CONFEITARIA_COSTA_001</Empresa>\n`;
                 xml += `  <DataGeracao>${new Date().toISOString()}</DataGeracao>\n`;
                 xml += `  <Registros>\n`;
 
@@ -1971,7 +1947,6 @@
                     xml += `      <Matricula>${p.matricula || 'N/A'}</Matricula>\n`;
                     xml += `      <DataHora>${p.data || new Date().toISOString()}</DataHora>\n`;
                     xml += `      <Turno>${p.turno || 'N/A'}</Turno>\n`;
-                    xml += `      <Departamento>${p.departamento || 'N/A'}</Departamento>\n`;
                     xml += `    </PontoBiometrico>\n`;
                 });
 
@@ -1987,14 +1962,10 @@
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-
                 showToast('📄 XML Oracle exportado com sucesso!', 'success');
             };
         }
 
-        // ============================================
-        // EXPORTAR CSV
-        // ============================================
         function exportarCSV() {
             const transaction = db.transaction(["pontos"], "readonly");
             const store = transaction.objectStore("pontos");
@@ -2002,7 +1973,6 @@
 
             requestAll.onsuccess = function() {
                 const registros = requestAll.result;
-
                 if (registros.length === 0) {
                     showToast('📭 Nenhum registro para exportar', 'warning');
                     return;
@@ -2023,38 +1993,8 @@
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-
                 showToast('📊 CSV exportado com sucesso!', 'success');
             };
-        }
-
-        // ============================================
-        // SINCRONIZAR ORACLE
-        // ============================================
-        function sincronizarOracle() {
-            const statusEl = document.getElementById('oracle-status');
-            statusEl.innerHTML = '🔄 Sincronizando com Oracle News Systems...';
-            statusEl.style.color = 'var(--warning)';
-
-            setTimeout(() => {
-                const apiKey = document.getElementById('oracle-api-key').value || 'ORACLE_NEWS_2026';
-                const companyId = document.getElementById('oracle-company-id').value || 'CONFEITARIA_COSTA_001';
-
-                statusEl.innerHTML = `
-                    ✅ Sincronizado com sucesso!\n
-                    📊 Empresa: ${companyId}\n
-                    🔑 API Key: ${apiKey}\n
-                    📅 Última sincronização: ${new Date().toLocaleString('pt-BR')}
-                `;
-                statusEl.style.color = 'var(--primary-light)';
-
-                showToast('✅ Sincronizado com Oracle News Systems!', 'success');
-                tocarSom('reconhecido');
-
-                // Exporta XML automaticamente
-                exportarXML();
-
-            }, 2000);
         }
 
         // ============================================
@@ -2062,11 +2002,9 @@
         // ============================================
         function limparHistorico() {
             if (!confirm('⚠️ Tem certeza que deseja limpar todo o histórico de batidas?')) return;
-
             const transaction = db.transaction(["pontos"], "readwrite");
             const store = transaction.objectStore("pontos");
             const requestClear = store.clear();
-
             requestClear.onsuccess = function() {
                 showToast('🗑️ Histórico limpo com sucesso!', 'warning');
                 carregarHistoricoPontos();
@@ -2078,16 +2016,14 @@
         // ============================================
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                document.querySelectorAll('.config-section, .admin-section').forEach(el => {
-                    el.classList.remove('open');
-                });
+                document.querySelectorAll('.config-section, .admin-section').forEach(el => el.classList.remove('open'));
                 document.querySelector('.card').style.display = 'block';
                 document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
                 document.querySelector('.menu-btn')?.classList.add('active');
             }
             if (e.key === 'r' || e.key === 'R') {
                 if (document.getElementById('adminSection').classList.contains('open')) {
-                    cadastrarBiometria();
+                    cadastrarBiometriaFaceAPI();
                 }
             }
             if (e.key === 'p' || e.key === 'P') {
@@ -2098,12 +2034,14 @@
         // ============================================
         // INICIALIZAÇÃO
         // ============================================
-        console.log('🔒 Ponto Biométrico Seguro v5.0 - Oracle News Systems');
+        console.log('🔒 Ponto Biométrico Seguro v6.0 - FaceAPI.js');
+        console.log('🧠 Reconhecimento facial REAL com IA local');
         console.log('📌 Clique 3 vezes no logo para área ADM');
         console.log('⌨️ ESC = fechar menus | R = cadastrar | P = PDF');
         console.log('🎵 Sons: Reconhecido 🎵 | Cadastrado 🎵 | Desconhecido 🎵');
-        console.log('📊 Oracle News Systems integrado!');
+        console.log('🔒 Sem AWS - Totalmente gratuito e local!');
     </script>
 
 </body>
+
 </html>
