@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ponto Facial - Reconhecimento Local</title>
+    <title>Ponto Biométrico Seguro - Premium</title>
 
     <!-- FaceAPI.js -->
     <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js">
@@ -18,7 +18,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         :root {
@@ -26,17 +26,17 @@
             --primary-dark: #059669;
             --primary-light: #34d399;
             --secondary: #06b6d4;
-            --bg-dark: #0a0a0f;
-            --bg-card: #14141e;
-            --border-color: #2a2a3a;
-            --text-light: #f0f0f0;
-            --text-muted: #8888aa;
-            --text-gray: #555577;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --border-color: #334155;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-gray: #475569;
             --danger: #f43f5e;
             --warning: #f59e0b;
             --success: #10b981;
-            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
-            --radius: 12px;
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --radius: 16px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -45,17 +45,32 @@
             color: var(--text-light);
             min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             padding: 20px;
-            background-image: radial-gradient(ellipse at 50% 0%, #1a1a2e 0%, #0a0a0f 70%);
+            background-image: radial-gradient(ellipse at 50% 0%, #1e293b 0%, #0f172a 70%);
+        }
+
+        /* ============================================
+           SCROLLBAR
+           ============================================ */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
         }
 
         /* ============================================
            CONTAINER PRINCIPAL
            ============================================ */
         .container {
-            max-width: 520px;
+            max-width: 580px;
             width: 100%;
             background: var(--bg-card);
             border-radius: var(--radius);
@@ -76,65 +91,164 @@
             border-bottom: 1px solid var(--border-color);
         }
 
-        .header .title {
-            font-size: 20px;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+            padding: 6px 12px;
+            border-radius: 10px;
+            transition: var(--transition);
+        }
+
+        .logo:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .logo .dot {
+            width: 12px;
+            height: 12px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            position: relative;
+        }
+
+        .logo .dot::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+            animation: pulse-ring 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .logo-text {
             font-weight: 700;
+            font-size: 18px;
             background: linear-gradient(135deg, var(--primary-light), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .header .subtitle {
-            font-size: 12px;
-            color: var(--text-muted);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .header .clock {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--primary-light);
-            background: rgba(16, 185, 129, 0.1);
-            padding: 4px 14px;
-            border-radius: 8px;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-
-        /* ============================================
-           STATUS TERMINAL
-           ============================================ */
-        .terminal-status {
+        .header-right {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 8px 14px;
-            border-radius: 8px;
-            margin-bottom: 16px;
+            gap: 12px;
+        }
+
+        .clock {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 14px;
+            border-radius: 10px;
             border: 1px solid var(--border-color);
         }
 
-        .terminal-status .label {
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        /* ============================================
+           MENU HAMBÚRGUER
+           ============================================ */
+        .menu-hamburger {
+            position: relative;
+            display: inline-block;
         }
 
-        .terminal-status .value {
-            font-size: 13px;
+        .menu-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
             font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .terminal-status .value.online {
+        .menu-btn:hover {
+            background: var(--border-color);
+        }
+
+        .menu-dropdown {
+            display: none;
+            position: absolute;
+            top: 110%;
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            min-width: 220px;
+            box-shadow: var(--shadow);
+            z-index: 50;
+            overflow: hidden;
+        }
+
+        .menu-dropdown.open {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .menu-dropdown .item {
+            padding: 12px 18px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu-dropdown .item:last-child {
+            border-bottom: none;
+        }
+
+        .menu-dropdown .item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
+        }
+
+        .menu-dropdown .item.active {
+            background: rgba(16, 185, 129, 0.15);
             color: var(--primary-light);
         }
-        .terminal-status .value.offline {
-            color: var(--danger);
-        }
-        .terminal-status .value.waiting {
-            color: var(--warning);
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* ============================================
@@ -144,8 +258,9 @@
             position: relative;
             width: 100%;
             aspect-ratio: 4/3;
-            background: #000;
-            border-radius: var(--radius);
+            max-height: 420px;
+            background: #020617;
+            border-radius: 12px;
             overflow: hidden;
             border: 2px solid var(--border-color);
             transition: var(--transition);
@@ -153,12 +268,7 @@
 
         .camera-box.active {
             border-color: var(--primary);
-            box-shadow: 0 0 40px rgba(16, 185, 129, 0.15);
-        }
-
-        .camera-box.error {
-            border-color: var(--danger);
-            box-shadow: 0 0 40px rgba(244, 63, 94, 0.15);
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
         }
 
         video {
@@ -168,69 +278,63 @@
             transform: scaleX(-1);
         }
 
-        .camera-overlay {
+        canvas#overlayCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .scanner-overlay {
             position: absolute;
             inset: 0;
+            border: 2px solid rgba(16, 185, 129, 0.15);
+            border-radius: 12px;
+            margin: 12px;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             pointer-events: none;
-            background: rgba(0, 0, 0, 0.3);
-            transition: var(--transition);
         }
 
-        .camera-overlay .icon {
-            font-size: 48px;
-            margin-bottom: 8px;
+        .scanner-circle {
+            width: 150px;
+            height: 150px;
+            border: 2px dashed rgba(6, 182, 212, 0.25);
+            border-radius: 50%;
+            position: relative;
         }
 
-        .camera-overlay .text {
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-
-        .camera-overlay .text strong {
-            color: var(--text-light);
-        }
-
-        .camera-overlay.hidden {
-            opacity: 0;
-        }
-
-        /* ============================================
-           SCANNER
-           ============================================ */
-        .scanner-line {
+        .scanner-circle::after {
+            content: '';
             position: absolute;
-            left: 10%;
-            right: 10%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--primary), transparent);
-            animation: scan-line 2.5s ease-in-out infinite;
-            opacity: 0.6;
-            display: none;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+            animation: scan 2s ease-in-out infinite;
         }
 
-        .scanner-line.active {
-            display: block;
-        }
-
-        @keyframes scan-line {
+        @keyframes scan {
             0%,
             100% {
-                top: 10%;
+                top: -2px;
             }
             50% {
-                top: 90%;
+                top: calc(100% - 2px);
             }
         }
 
         .recognition-flash {
             position: absolute;
             inset: 0;
-            background: rgba(16, 185, 129, 0.25);
-            border-radius: var(--radius);
+            background: rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.1s;
@@ -238,7 +342,7 @@
 
         .recognition-flash.active {
             opacity: 1;
-            animation: flash 0.4s ease;
+            animation: flash 0.3s ease;
         }
 
         @keyframes flash {
@@ -254,130 +358,134 @@
         }
 
         /* ============================================
-           FACE BOX (caixa de detecção)
+           MENSAGENS DE STATUS
            ============================================ */
-        .face-box {
-            position: absolute;
-            border: 2px solid var(--primary);
-            border-radius: 8px;
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
-            display: none;
-            pointer-events: none;
-        }
-
-        .face-box.active {
-            display: block;
-            animation: facePulse 1.5s ease-in-out infinite;
-        }
-
-        @keyframes facePulse {
-            0%,
-            100% {
-                box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
-            }
-            50% {
-                box-shadow: 0 0 50px rgba(16, 185, 129, 0.6);
-            }
-        }
-
-        /* ============================================
-           MATCH INFO
-           ============================================ */
-        .match-info {
+        .match-container {
             display: flex;
             align-items: center;
             gap: 16px;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 14px 16px;
-            border-radius: var(--radius);
+            background: rgba(15, 23, 42, 0.6);
+            padding: 16px 20px;
+            border-radius: 12px;
             border: 1px solid var(--border-color);
             margin-top: 16px;
-            min-height: 70px;
             transition: var(--transition);
+            min-height: 80px;
         }
 
-        .match-info.found {
+        .match-container.found {
             border-color: var(--primary);
-            background: rgba(16, 185, 129, 0.08);
+            background: rgba(16, 185, 129, 0.15);
+            border-width: 2px;
         }
 
-        .match-info.registered {
+        .match-container.registered {
             border-color: var(--warning);
-            background: rgba(245, 158, 11, 0.08);
+            background: rgba(245, 158, 11, 0.15);
+            border-width: 2px;
         }
 
-        .match-info.not-found {
+        .match-container.not-found {
             border-color: var(--danger);
-            background: rgba(244, 63, 94, 0.08);
+            background: rgba(244, 63, 94, 0.15);
+            border-width: 2px;
         }
 
-        .match-info .avatar {
-            width: 50px;
-            height: 50px;
+        .match-container.waiting {
+            border-color: var(--border-color);
+            background: rgba(15, 23, 42, 0.6);
+        }
+
+        .match-photo {
+            width: 64px;
+            height: 64px;
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid var(--border-color);
             background: var(--bg-dark);
-            flex-shrink: 0;
             transition: var(--transition);
+            flex-shrink: 0;
         }
 
-        .match-info .avatar.found {
+        .match-photo.found {
             border-color: var(--primary);
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
         }
 
-        .match-info .avatar.registered {
+        .match-photo.registered {
             border-color: var(--warning);
-            box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.4);
         }
 
-        .match-info .avatar.not-found {
+        .match-photo.not-found {
             border-color: var(--danger);
-            box-shadow: 0 0 20px rgba(244, 63, 94, 0.3);
+            box-shadow: 0 0 30px rgba(244, 63, 94, 0.4);
         }
 
-        .match-info .details {
-            flex: 1;
+        .match-info {
+            flex-grow: 1;
         }
 
-        .match-info .name {
+        .match-name {
             font-weight: 700;
-            font-size: 16px;
+            font-size: 18px;
+            color: var(--text-light);
         }
 
-        .match-info .name.found {
+        .match-name.found {
             color: var(--primary-light);
-        }
-        .match-info .name.registered {
-            color: var(--warning);
-        }
-        .match-info .name.not-found {
-            color: var(--danger);
+            font-size: 20px;
         }
 
-        .match-info .sub {
-            font-size: 13px;
+        .match-name.registered {
+            color: var(--warning);
+            font-size: 20px;
+        }
+
+        .match-name.not-found {
+            color: var(--danger);
+            font-size: 20px;
+        }
+
+        .match-status {
+            font-size: 14px;
             color: var(--text-muted);
             margin-top: 2px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .match-status .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .dot-green {
+            background: var(--primary);
+        }
+        .dot-yellow {
+            background: var(--warning);
+        }
+        .dot-red {
+            background: var(--danger);
+        }
+        .dot-gray {
+            background: var(--text-gray);
         }
 
         /* ============================================
            BOTÕES
            ============================================ */
-        .btn-group {
-            display: flex;
-            gap: 8px;
-            margin-top: 16px;
-            flex-wrap: wrap;
-        }
-
         .btn {
-            padding: 12px 20px;
+            padding: 14px 20px;
             border: none;
-            border-radius: var(--radius);
+            border-radius: 12px;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 16px;
             cursor: pointer;
             transition: var(--transition);
             flex: 1;
@@ -385,7 +493,7 @@
         }
 
         .btn:active {
-            transform: scale(0.96);
+            transform: scale(0.97);
         }
 
         .btn-primary {
@@ -410,7 +518,7 @@
         }
 
         .btn-secondary:hover {
-            background: #3a3a4a;
+            background: #475569;
         }
 
         .btn-danger {
@@ -432,102 +540,137 @@
         }
 
         .btn-sm {
-            padding: 6px 14px;
+            padding: 8px 14px;
             font-size: 12px;
             flex: none;
         }
 
-        /* ============================================
-           SISTEMA DE LOGS
-           ============================================ */
-        .log-system {
-            margin-top: 16px;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: var(--radius);
-            padding: 12px 16px;
-            border: 1px solid var(--border-color);
-            max-height: 150px;
-            overflow-y: auto;
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
         }
 
-        .log-system::-webkit-scrollbar {
-            width: 4px;
-        }
-        .log-system::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .log-system::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 4px;
-        }
-
-        .log-system .log-title {
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 6px;
-        }
-
-        .log-system .log-entry {
-            font-size: 12px;
-            color: var(--text-muted);
-            padding: 2px 0;
-            font-family: 'Courier New', monospace;
-        }
-
-        .log-system .log-entry .time {
-            color: var(--text-gray);
-        }
-
-        .log-system .log-entry .msg-success {
-            color: var(--primary-light);
-        }
-        .log-system .log-entry .msg-error {
-            color: var(--danger);
-        }
-        .log-system .log-entry .msg-warning {
-            color: var(--warning);
-        }
-        .log-system .log-entry .msg-info {
-            color: var(--secondary);
+        .btn-group .btn {
+            flex: 1;
+            min-width: 80px;
         }
 
         /* ============================================
-           ADMIN PANEL (oculto)
+           CONFIGURAÇÕES
            ============================================ */
-        .admin-panel {
+        .config-section {
             display: none;
             margin-top: 16px;
             padding: 16px;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: var(--radius);
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
             border: 1px solid var(--border-color);
         }
 
-        .admin-panel.open {
+        .config-section.open {
             display: block;
             animation: fadeIn 0.3s ease;
         }
 
-        .admin-panel .admin-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-muted);
-            margin-bottom: 12px;
+        .config-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 8px;
+        }
+
+        .config-item:last-child {
+            border-bottom: none;
+        }
+
+        .config-item label {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .config-item .toggle {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            background: var(--border-color);
+            border-radius: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .config-item .toggle.active {
+            background: var(--primary);
+        }
+
+        .config-item .toggle .thumb {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .config-item .toggle.active .thumb {
+            left: 25px;
+        }
+
+        .config-item select {
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px 12px;
+            color: var(--text-light);
+            font-size: 14px;
+            outline: none;
+        }
+
+        .config-item select:focus {
+            border-color: var(--primary);
+        }
+
+        /* ============================================
+           ADMIN PANEL
+           ============================================ */
+        .admin-section {
+            display: none;
+            margin-top: 16px;
+            padding: 16px;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .admin-section.open {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .admin-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #cbd5e1;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .admin-panel .admin-title .badge {
+        .admin-title .badge {
             font-size: 10px;
-            padding: 2px 12px;
-            border-radius: 12px;
+            padding: 4px 12px;
+            border-radius: 20px;
             background: rgba(244, 63, 94, 0.2);
             color: var(--danger);
+            font-weight: 600;
+            text-transform: uppercase;
         }
 
         .input-group {
@@ -536,6 +679,7 @@
 
         .input-group label {
             font-size: 11px;
+            font-weight: 600;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -568,6 +712,70 @@
         }
 
         /* ============================================
+           TABELA DE LOGS
+           ============================================ */
+        .log-table-wrapper {
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            margin-top: 10px;
+        }
+
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .log-table th,
+        .log-table td {
+            padding: 8px 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .log-table th {
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .log-table .photo-preview {
+            width: 35px;
+            height: 28px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .log-table .empty-row td {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 20px;
+            font-style: italic;
+        }
+
+        /* ============================================
+           PDF SECTION
+           ============================================ */
+        .pdf-section {
+            display: none;
+            margin-top: 16px;
+            padding: 16px;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .pdf-section.open {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* ============================================
            TOAST
            ============================================ */
         .toast-container {
@@ -583,16 +791,16 @@
         }
 
         .toast {
-            padding: 12px 18px;
-            border-radius: var(--radius);
+            padding: 14px 20px;
+            border-radius: 12px;
             color: white;
             font-size: 14px;
             font-weight: 500;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             animation: slideUp 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .toast-success {
@@ -604,9 +812,6 @@
         .toast-warning {
             background: var(--warning);
             color: #333;
-        }
-        .toast-info {
-            background: var(--secondary);
         }
 
         @keyframes slideUp {
@@ -630,7 +835,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.85);
             z-index: 9999;
             justify-content: center;
             align-items: center;
@@ -643,10 +848,10 @@
         }
 
         .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid var(--border-color);
-            border-top: 3px solid var(--primary);
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -661,28 +866,42 @@
         }
 
         .loading-text {
-            color: var(--text-muted);
-            font-size: 14px;
+            color: var(--text-light);
+            font-size: 16px;
             text-align: center;
             line-height: 1.6;
         }
 
-        .loading-text strong {
-            color: var(--text-light);
+        .loading-text .sub {
+            font-size: 13px;
+            color: var(--text-muted);
         }
 
         /* ============================================
-           ANIMAÇÕES
+           FOOTER
            ============================================ */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        footer {
+            text-align: center;
+            padding: 16px;
+            font-size: 11px;
+            color: var(--text-gray);
+            border-top: 1px solid var(--border-color);
+            margin-top: 20px;
+            max-width: 580px;
+            width: 100%;
+        }
+
+        footer .footer-icons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        footer .footer-icons span {
+            font-size: 12px;
+            color: var(--text-muted);
         }
 
         /* ============================================
@@ -692,15 +911,39 @@
             .container {
                 padding: 16px;
             }
-            .header .title {
-                font-size: 16px;
-            }
-            .header .clock {
-                font-size: 14px;
-                padding: 2px 10px;
-            }
             .input-row {
                 grid-template-columns: 1fr;
+            }
+            .header {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .logo-text {
+                font-size: 15px;
+            }
+            .clock {
+                font-size: 12px;
+                padding: 4px 10px;
+            }
+            .menu-btn {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+            .match-container {
+                padding: 12px 14px;
+                min-height: 70px;
+            }
+            .match-photo {
+                width: 50px;
+                height: 50px;
+            }
+            .match-name {
+                font-size: 15px;
+            }
+            .match-name.found,
+            .match-name.registered,
+            .match-name.not-found {
+                font-size: 17px;
             }
             .btn-group {
                 flex-direction: column;
@@ -709,23 +952,13 @@
                 flex: none;
                 width: 100%;
             }
-            .terminal-status {
-                flex-wrap: wrap;
-                gap: 4px;
+            .menu-dropdown {
+                right: -40px;
+                min-width: 180px;
             }
-            .match-info {
-                padding: 10px 12px;
-                min-height: 60px;
-            }
-            .match-info .avatar {
-                width: 40px;
-                height: 40px;
-            }
-            .camera-overlay .icon {
-                font-size: 32px;
-            }
-            .camera-overlay .text {
-                font-size: 12px;
+            .scanner-circle {
+                width: 100px;
+                height: 100px;
             }
         }
 
@@ -738,22 +971,28 @@
                 color: #333;
             }
             .camera-box,
+            .scanner-overlay,
+            .btn,
             .btn-group,
-            .header .clock,
-            .terminal-status,
-            .match-info,
-            .log-system,
-            .admin-panel {
+            .input-group,
+            header,
+            footer,
+            .match-container,
+            .menu-hamburger {
                 display: none !important;
             }
-            .container {
-                box-shadow: none;
+            .admin-section {
+                display: block !important;
                 border: none;
+                padding: 0;
                 background: white;
             }
-            .header .title {
-                color: #333 !important;
-                -webkit-text-fill-color: #333 !important;
+            .log-table th {
+                background: #f0f0f0;
+                color: #333;
+            }
+            .log-table td {
+                border-color: #ddd;
             }
         }
     </style>
@@ -767,8 +1006,8 @@
     <div class="loading-overlay active" id="loadingOverlay">
         <div class="loading-spinner"></div>
         <div class="loading-text">
-            Carregando reconhecimento facial...<br>
-            <strong>FaceAPI.js - IA Local</strong>
+            🧠 Carregando IA de Reconhecimento Facial<br>
+            <span class="sub">FaceAPI.js - Processamento local e gratuito</span>
         </div>
     </div>
 
@@ -784,70 +1023,106 @@
 
         <!-- HEADER -->
         <div class="header">
-            <div>
-                <div class="title">PONTO FACIAL</div>
-                <div class="subtitle">Reconhecimento Local</div>
+            <div class="logo" id="admTrigger" title="Clique 3 vezes para ADM">
+                <div class="dot"></div>
+                <span class="logo-text">PONTO SEGURO</span>
             </div>
-            <div class="clock" id="clock">00:00:00</div>
-        </div>
-
-        <!-- STATUS TERMINAL -->
-        <div class="terminal-status">
-            <span>
-                <span class="label">Terminal</span>
-                <span class="value" style="color:var(--primary-light);">01</span>
-            </span>
-            <span>
-                <span class="label">Câmera</span>
-                <span class="value online" id="cameraStatus">● Online</span>
-            </span>
-            <span>
-                <span class="label">Status</span>
-                <span class="value waiting" id="scanStatus">● Aguardando</span>
-            </span>
-        </div>
-
-        <!-- CÂMERA -->
-        <div class="camera-box" id="cameraBox">
-            <video id="video" autoplay playsinline muted></video>
-            <div class="scanner-line" id="scannerLine"></div>
-            <div class="recognition-flash" id="recognitionFlash"></div>
-            <div class="face-box" id="faceBox"></div>
-            <div class="camera-overlay" id="cameraOverlay">
-                <div class="icon">📷</div>
-                <div class="text">
-                    <strong>Permita o acesso à câmera</strong><br>
-                    no navegador para continuar
+            <div class="header-right">
+                <div class="clock" id="clock">00:00:00</div>
+                <div class="menu-hamburger">
+                    <button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
+                    <div class="menu-dropdown" id="menuDropdown">
+                        <div class="item active" onclick="toggleSection('main');closeMenu();">🏠 Início</div>
+                        <div class="item" onclick="toggleSection('config');closeMenu();">⚙️ Configurações</div>
+                        <div class="item" onclick="toggleSection('admin');closeMenu();">🔒 ADM</div>
+                        <div class="item" onclick="toggleSection('pdf');closeMenu();">📄 PDF</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- MATCH INFO -->
-        <div class="match-info waiting" id="matchInfo">
-            <img id="avatar" class="avatar"
-                src="data:image/svg+xml;utf8,<svg xmlns='http://w3.org' viewBox='0 0 24 24' fill='%23475569'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-4-8-4z'/></svg>">
-            <div class="details">
-                <div class="name" id="matchName">Procurando rosto...</div>
-                <div class="sub" id="matchSub">Olhe diretamente para a câmera</div>
+        <!-- CARD PRINCIPAL -->
+        <div id="mainSection">
+            <div class="camera-box" id="cameraBox">
+                <video id="video" autoplay playsinline muted></video>
+                <canvas id="overlayCanvas"></canvas>
+                <div class="scanner-overlay">
+                    <div class="scanner-circle"></div>
+                </div>
+                <div class="recognition-flash" id="recognitionFlash"></div>
+            </div>
+
+            <div class="match-container waiting" id="matchContainer">
+                <img id="matchImg" class="match-photo"
+                    src="data:image/svg+xml;utf8,<svg xmlns='http://w3.org' viewBox='0 0 24 24' fill='%23475569'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-4-8-4z'/></svg>">
+                <div class="match-info">
+                    <div id="matchName" class="match-name">Aguardando...</div>
+                    <div id="matchStatus" class="match-status">
+                        <span class="dot dot-gray"></span>
+                        Posicione o rosto na câmera
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" id="btnRegister" disabled>✅ Registrar Ponto</button>
+                <button class="btn btn-secondary" onclick="toggleSection('admin')">🔒 ADM</button>
+                <button class="btn btn-secondary" onclick="toggleSection('pdf')">📄 PDF</button>
             </div>
         </div>
 
-        <!-- BOTÕES -->
-        <div class="btn-group">
-            <button class="btn btn-primary" id="btnRegister" disabled>✅ Registrar Presença</button>
-            <button class="btn btn-secondary" id="btnAdmin" onclick="toggleAdmin()">🔒 ADM</button>
-        </div>
+        <!-- CONFIGURAÇÕES -->
+        <div id="configSection" class="config-section">
+            <div class="admin-title">
+                <span>⚙️ Configurações</span>
+                <span class="badge">PREFERENCES</span>
+            </div>
 
-        <!-- LOG SYSTEM -->
-        <div class="log-system" id="logSystem">
-            <div class="log-title">📋 SISTEMA</div>
-            <div id="logEntries">
-                <div class="log-entry"><span class="time" id="logTime">[00:00:00]</span> <span class="msg-info">Iniciando sistema...</span></div>
+            <div class="config-item">
+                <label>🔊 Som de Reconhecimento</label>
+                <div class="toggle active" onclick="toggleConfig(this)">
+                    <div class="thumb"></div>
+                </div>
+            </div>
+
+            <div class="config-item">
+                <label>🔊 Som de Cadastro</label>
+                <div class="toggle active" onclick="toggleConfig(this)">
+                    <div class="thumb"></div>
+                </div>
+            </div>
+
+            <div class="config-item">
+                <label>🔊 Som de Rosto Desconhecido</label>
+                <div class="toggle active" onclick="toggleConfig(this)">
+                    <div class="thumb"></div>
+                </div>
+            </div>
+
+            <div class="config-item">
+                <label>📸 Auto Reconhecimento</label>
+                <div class="toggle active" onclick="toggleConfig(this)">
+                    <div class="thumb"></div>
+                </div>
+            </div>
+
+            <div class="config-item">
+                <label>⏱️ Intervalo entre registros</label>
+                <select id="intervaloRegistro">
+                    <option value="1">1 minuto</option>
+                    <option value="5" selected>5 minutos</option>
+                    <option value="10">10 minutos</option>
+                    <option value="15">15 minutos</option>
+                    <option value="30">30 minutos</option>
+                    <option value="60">1 hora</option>
+                    <option value="120">2 horas</option>
+                    <option value="480">8 horas (1 vez/dia)</option>
+                </select>
             </div>
         </div>
 
-        <!-- ADMIN PANEL -->
-        <div class="admin-panel" id="adminPanel">
+        <!-- ADMIN -->
+        <div id="adminSection" class="admin-section">
             <div class="admin-title">
                 <span>🔒 Painel Administrativo</span>
                 <span class="badge">RESTRITO</span>
@@ -896,52 +1171,98 @@
                 <button class="btn btn-danger btn-sm" onclick="limparHistorico()" style="flex:1;">🗑️ Limpar</button>
             </div>
 
-            <div style="margin-top:12px;">
-                <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-color);padding-bottom:8px;margin-bottom:8px;">
-                    <span style="font-size:13px;color:var(--text-muted);">📋 Histórico</span>
-                    <span id="logCount" style="font-size:12px;color:var(--text-gray);">0</span>
-                </div>
-                <div style="overflow-x:auto;">
-                    <table style="width:100%;border-collapse:collapse;font-size:12px;">
-                        <thead>
-                            <tr style="color:var(--text-muted);border-bottom:1px solid var(--border-color);">
-                                <th style="padding:6px 8px;text-align:left;">Foto</th>
-                                <th style="padding:6px 8px;text-align:left;">Nome</th>
-                                <th style="padding:6px 8px;text-align:left;">Data/Hora</th>
-                            </tr>
-                        </thead>
-                        <tbody id="logBody">
-                            <tr><td colspan="3" style="text-align:center;color:var(--text-gray);padding:16px;">📭 Nenhum registro</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="admin-title" style="margin-top:16px;border-top:1px solid var(--border-color);padding-top:12px;">
+                <span>📋 Histórico</span>
+                <span id="logCount" style="font-size:12px;color:var(--text-muted);">0</span>
+            </div>
+
+            <div class="log-table-wrapper">
+                <table class="log-table">
+                    <thead>
+                        <tr>
+                            <th>Foto</th>
+                            <th>Nome</th>
+                            <th>Matrícula</th>
+                            <th>Data/Hora</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logBody">
+                        <tr class="empty-row">
+                            <td colspan="4">📭 Nenhum registro</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PDF -->
+        <div id="pdfSection" class="pdf-section">
+            <div class="admin-title">
+                <span>📄 Relatórios</span>
+                <span class="badge">PDF</span>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <button class="btn btn-secondary" onclick="exportarPDF()" style="padding:14px;">
+                    📋 Relatório de Ponto
+                </button>
+                <button class="btn btn-secondary" onclick="exportarRelatorioCompleto()" style="padding:14px;background:#475569;">
+                    📊 Relatório Completo
+                </button>
+                <button class="btn btn-secondary" onclick="exportarXML()" style="padding:14px;background:#06b6d4;color:#020617;">
+                    📄 XML Oracle
+                </button>
+                <button class="btn btn-secondary" onclick="exportarCSV()" style="padding:14px;background:#f59e0b;color:#020617;">
+                    📊 CSV Excel
+                </button>
+            </div>
+
+            <div style="margin-top:16px;background:rgba(30,41,59,0.5);padding:16px;border-radius:8px;">
+                <p style="font-size:12px;color:var(--text-muted);text-align:center;">
+                    📁 Documentos gerados em tempo real
+                </p>
             </div>
         </div>
 
     </div>
 
     <!-- ==========================================
-    JAVASCRIPT - SISTEMA COMPLETO
+    FOOTER
+    ========================================== -->
+    <footer>
+        <div class="footer-icons">
+            <span>🔒 Reconhecimento Local</span>
+            <span>•</span>
+            <span>🧠 FaceAPI.js</span>
+            <span>•</span>
+            <span>📄 Exportação PDF</span>
+            <span>•</span>
+            <span>🎵 Sons IA</span>
+            <span>•</span>
+            <span>⏱️ Registro Único</span>
+        </div>
+        &copy; 2026 Ponto Biométrico Seguro v11.0
+    </footer>
+
+    <!-- ==========================================
+    JAVASCRIPT COMPLETO - COM FACEAPI REAL
     ========================================== -->
     <script>
         // ============================================
-        // VARIÁVEIS GLOBAIS
+        // VARIÁVEIS
         // ============================================
         const video = document.getElementById('video');
+        const overlayCanvas = document.getElementById('overlayCanvas');
+        const ctx = overlayCanvas.getContext('2d');
+        const admTrigger = document.getElementById('admTrigger');
         const cameraBox = document.getElementById('cameraBox');
-        const cameraOverlay = document.getElementById('cameraOverlay');
-        const scannerLine = document.getElementById('scannerLine');
-        const recognitionFlash = document.getElementById('recognitionFlash');
-        const faceBox = document.getElementById('faceBox');
-        const matchInfo = document.getElementById('matchInfo');
-        const avatar = document.getElementById('avatar');
+        const matchContainer = document.getElementById('matchContainer');
+        const matchImg = document.getElementById('matchImg');
         const matchName = document.getElementById('matchName');
-        const matchSub = document.getElementById('matchSub');
+        const matchStatus = document.getElementById('matchStatus');
+        const recognitionFlash = document.getElementById('recognitionFlash');
+        const loadingOverlay = document.getElementById('loadingOverlay');
         const btnRegister = document.getElementById('btnRegister');
-        const cameraStatus = document.getElementById('cameraStatus');
-        const scanStatus = document.getElementById('scanStatus');
-        const logEntries = document.getElementById('logEntries');
-        const logTime = document.getElementById('logTime');
 
         let db = null;
         let trabalhadores = [];
@@ -951,15 +1272,13 @@
         let faceapiReady = false;
         let ultimoRegistro = {};
         let rostoDetectado = false;
-        let stream = null;
         let detectionInterval = null;
-        let logCount = 0;
-
-        // ============================================
-        // CONFIGURAÇÕES DE SOM (MAIS ALTOS)
-        // ============================================
         let somAtivo = true;
+        let reconhecimentoAutomatico = true;
 
+        // ============================================
+        // SONS MAIS ALTOS
+        // ============================================
         function tocarSom(tipo) {
             if (!somAtivo) return;
             try {
@@ -1015,37 +1334,14 @@
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
-            toast.textContent = message;
+            const icons = { success: '✅', error: '❌', warning: '⚠️' };
+            toast.innerHTML = `${icons[type] || '📢'} ${message}`;
             container.appendChild(toast);
             setTimeout(() => {
                 toast.style.opacity = '0';
                 toast.style.transform = 'translateX(100px)';
                 setTimeout(() => toast.remove(), 300);
             }, 4000);
-        }
-
-        // ============================================
-        // LOG SYSTEM
-        // ============================================
-        function addLog(message, type = 'info') {
-            const now = new Date();
-            const time = now.toLocaleTimeString('pt-BR');
-            const entry = document.createElement('div');
-            entry.className = 'log-entry';
-            const msgClass = {
-                'success': 'msg-success',
-                'error': 'msg-error',
-                'warning': 'msg-warning',
-                'info': 'msg-info'
-            } [type] || 'msg-info';
-            entry.innerHTML = `<span class="time">[${time}]</span> <span class="${msgClass}">${message}</span>`;
-            logEntries.appendChild(entry);
-            logEntries.scrollTop = logEntries.scrollHeight;
-            logCount++;
-            // Mantém apenas os últimos 50 logs
-            while (logEntries.children.length > 50) {
-                logEntries.removeChild(logEntries.firstChild);
-            }
         }
 
         // ============================================
@@ -1056,23 +1352,80 @@
         }, 1000);
 
         // ============================================
-        // ADMIN TOGGLE
+        // MENU
         // ============================================
-        function toggleAdmin() {
-            document.getElementById('adminPanel').classList.toggle('open');
-            if (document.getElementById('adminPanel').classList.contains('open')) {
-                carregarHistorico();
-                addLog('Painel administrativo aberto', 'warning');
+        function toggleMenu() {
+            document.getElementById('menuDropdown').classList.toggle('open');
+        }
+
+        function closeMenu() {
+            document.getElementById('menuDropdown').classList.remove('open');
+        }
+
+        document.addEventListener('click', function(e) {
+            const menu = document.querySelector('.menu-hamburger');
+            if (!menu.contains(e.target)) {
+                closeMenu();
+            }
+        });
+
+        // ============================================
+        // TOGGLE CONFIG
+        // ============================================
+        function toggleConfig(element) {
+            element.classList.toggle('active');
+            const label = element.parentElement.querySelector('label');
+            if (label) {
+                const text = label.textContent.trim();
+                if (text.includes('Som')) {
+                    somAtivo = element.classList.contains('active');
+                    showToast(somAtivo ? '🔊 Sons ativados' : '🔇 Sons desativados', 'info');
+                }
+                if (text.includes('Auto Reconhecimento')) {
+                    reconhecimentoAutomatico = element.classList.contains('active');
+                    showToast(reconhecimentoAutomatico ? '🔄 Reconhecimento automático ativado' :
+                        '⏸️ Reconhecimento automático desativado', 'info');
+                }
             }
         }
 
-        // Trigger ADM (3 cliques no título)
-        document.querySelector('.header .title').addEventListener('click', () => {
+        // ============================================
+        // TOGGLE SECTION
+        // ============================================
+        function toggleSection(section) {
+            document.querySelectorAll('.card, .config-section, .admin-section, .pdf-section').forEach(el => {
+                el.style.display = 'none';
+            });
+
+            const sections = {
+                'main': document.getElementById('mainSection'),
+                'config': document.getElementById('configSection'),
+                'admin': document.getElementById('adminSection'),
+                'pdf': document.getElementById('pdfSection')
+            };
+
+            if (sections[section]) {
+                sections[section].style.display = 'block';
+            }
+
+            document.querySelectorAll('.menu-dropdown .item').forEach(item => item.classList.remove('active'));
+            const items = document.querySelectorAll('.menu-dropdown .item');
+            const map = { 'main': 0, 'config': 1, 'admin': 2, 'pdf': 3 };
+            if (map[section] !== undefined && items[map[section]]) {
+                items[map[section]].classList.add('active');
+            }
+        }
+
+        // ============================================
+        // TRIGGER ADMIN
+        // ============================================
+        admTrigger.addEventListener('click', () => {
             clickCount++;
             if (clickCount === 3) {
-                toggleAdmin();
+                toggleSection('admin');
                 clickCount = 0;
                 showToast('🔓 Painel administrativo liberado!', 'warning');
+                closeMenu();
             }
             setTimeout(() => { clickCount = 0; }, 2000);
         });
@@ -1080,13 +1433,14 @@
         // ============================================
         // INDEXEDDB
         // ============================================
-        const request = indexedDB.open("PontoFacialDB", 3);
+        const request = indexedDB.open("PontoBiometricoDB", 3);
 
         request.onupgradeneeded = function(e) {
             const db = e.target.result;
             if (!db.objectStoreNames.contains("trabalhadores")) {
                 const store = db.createObjectStore("trabalhadores", { keyPath: "id" });
                 store.createIndex("nome", "nome", { unique: false });
+                store.createIndex("descritor", "descritor", { unique: false });
             }
             if (!db.objectStoreNames.contains("pontos")) {
                 const store = db.createObjectStore("pontos", { autoIncrement: true });
@@ -1101,12 +1455,10 @@
             carregarHistorico();
             iniciarCamera();
             carregarFaceAPI();
-            addLog('Sistema iniciado com sucesso', 'success');
         };
 
         request.onerror = function() {
             showToast('❌ Erro ao acessar banco de dados', 'error');
-            addLog('Erro ao acessar banco de dados', 'error');
         };
 
         // ============================================
@@ -1114,24 +1466,29 @@
         // ============================================
         async function carregarFaceAPI() {
             try {
-                document.getElementById('loadingOverlay').classList.add('active');
+                loadingOverlay.classList.add('active');
+                document.querySelector('.loading-text .sub').textContent = 'Baixando modelos de IA...';
+
                 const MODEL_URL = 'https://justadudewhohas.github.io/face-api.js/models';
 
                 await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
                 await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
                 await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
 
+                document.querySelector('.loading-text .sub').textContent = 'Modelos carregados!';
+
                 faceapiReady = true;
-                document.getElementById('loadingOverlay').classList.remove('active');
-                showToast('🧠 IA de reconhecimento facial pronta!', 'success');
-                addLog('IA de reconhecimento facial carregada', 'success');
-                iniciarReconhecimento();
+
+                setTimeout(() => {
+                    loadingOverlay.classList.remove('active');
+                    showToast('🧠 IA de reconhecimento facial pronta!', 'success');
+                    iniciarReconhecimento();
+                }, 500);
 
             } catch (error) {
-                document.getElementById('loadingOverlay').classList.remove('active');
-                console.error('Erro FaceAPI:', error);
-                showToast('⚠️ Erro ao carregar IA. Modo simulação.', 'warning');
-                addLog('Erro ao carregar IA - Modo simulação', 'error');
+                loadingOverlay.classList.remove('active');
+                console.error('Erro ao carregar FaceAPI:', error);
+                showToast('⚠️ Erro ao carregar IA. Modo simulação.', 'error');
                 iniciarReconhecimentoSimulado();
             }
         }
@@ -1141,7 +1498,7 @@
         // ============================================
         async function iniciarCamera() {
             try {
-                stream = await navigator.mediaDevices.getUserMedia({
+                const stream = await navigator.mediaDevices.getUserMedia({
                     audio: false,
                     video: {
                         facingMode: "user",
@@ -1153,27 +1510,31 @@
                 video.onloadedmetadata = () => {
                     video.play();
                     cameraBox.classList.add('active');
-                    cameraOverlay.classList.add('hidden');
-                    scannerLine.classList.add('active');
-                    cameraStatus.className = 'value online';
-                    cameraStatus.textContent = '● Online';
-                    addLog('Câmera ativada com sucesso', 'success');
+                    overlayCanvas.width = video.videoWidth || 640;
+                    overlayCanvas.height = video.videoHeight || 480;
                 };
             } catch (err) {
-                cameraBox.classList.add('error');
-                cameraOverlay.querySelector('.icon').textContent = '⚠️';
-                cameraOverlay.querySelector('.text').innerHTML =
-                    '<strong>Permita o acesso à câmera</strong><br>no navegador para continuar';
-                cameraOverlay.classList.remove('hidden');
-                cameraStatus.className = 'value offline';
-                cameraStatus.textContent = '● Erro';
                 showToast('⚠️ Permita o acesso à câmera', 'error');
-                addLog('Erro ao acessar câmera', 'error');
             }
         }
 
         // ============================================
-        // RECONHECIMENTO REAL
+        // VERIFICAR REGISTRO
+        // ============================================
+        function podeRegistrar(matricula) {
+            const intervalo = parseInt(document.getElementById('intervaloRegistro').value) || 5;
+            const agora = Date.now();
+            const ultimo = ultimoRegistro[matricula] || 0;
+            const diff = (agora - ultimo) / (1000 * 60);
+
+            if (diff < intervalo) {
+                return { pode: false, tempoRestante: Math.ceil(intervalo - diff) };
+            }
+            return { pode: true, tempoRestante: 0 };
+        }
+
+        // ============================================
+        // RECONHECIMENTO FACEAPI REAL
         // ============================================
         function iniciarReconhecimento() {
             if (detectionInterval) clearInterval(detectionInterval);
@@ -1186,35 +1547,27 @@
                         .withFaceLandmarks()
                         .withFaceDescriptors();
 
+                    ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+
                     if (detections.length > 0) {
                         rostoDetectado = true;
-                        scanStatus.className = 'value online';
-                        scanStatus.textContent = '● Rosto detectado';
 
-                        // Atualiza a caixa de rosto
-                        const detection = detections[0];
-                        const box = detection.detection.box;
-                        const videoRect = video.getBoundingClientRect();
-                        const scaleX = videoRect.width / video.videoWidth;
-                        const scaleY = videoRect.height / video.videoHeight;
+                        const resizedDetections = faceapi.resizeResults(detections, {
+                            width: overlayCanvas.width,
+                            height: overlayCanvas.height
+                        });
 
-                        faceBox.style.left = (box.x * scaleX) + 'px';
-                        faceBox.style.top = (box.y * scaleY) + 'px';
-                        faceBox.style.width = (box.width * scaleX) + 'px';
-                        faceBox.style.height = (box.height * scaleY) + 'px';
-                        faceBox.className = 'face-box active';
+                        faceapi.draw.drawDetections(overlayCanvas, resizedDetections);
+                        faceapi.draw.drawFaceLandmarks(overlayCanvas, resizedDetections);
 
-                        const descriptor = detections[0].descriptor;
-                        await buscarMatch(descriptor);
+                        if (reconhecimentoAutomatico) {
+                            const descriptor = detections[0].descriptor;
+                            await buscarMatch(descriptor);
+                        }
 
                     } else {
                         rostoDetectado = false;
-                        faceBox.className = 'face-box';
-                        if (!isScanning) {
-                            scanStatus.className = 'value waiting';
-                            scanStatus.textContent = '● Aguardando';
-                            resetMatch();
-                        }
+                        if (!isScanning) resetMatch();
                     }
 
                 } catch (error) {
@@ -1228,7 +1581,16 @@
         // ============================================
         async function buscarMatch(descriptor) {
             if (trabalhadores.length === 0) {
-                setMatchStatus('not-found', '⚠️ Nenhum colaborador cadastrado', 'Cadastre no painel ADM');
+                matchContainer.className = 'match-container not-found';
+                matchName.className = 'match-name not-found';
+                matchName.textContent = '⚠️ Nenhum Cadastro';
+                matchImg.className = 'match-photo not-found';
+                matchImg.src =
+                    "data:image/svg+xml;utf8,<svg xmlns='http://w3.org' viewBox='0 0 24 24' fill='%23f43f5e'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/></svg>";
+                matchStatus.innerHTML = `
+                    <span class="dot dot-red"></span>
+                    NENHUM COLABORADOR CADASTRADO
+                `;
                 return;
             }
 
@@ -1237,48 +1599,71 @@
 
             for (const worker of trabalhadores) {
                 if (!worker.descritor) continue;
+
                 try {
                     const descritorSalvo = new Float32Array(worker.descritor);
                     const distancia = faceapi.euclideanDistance(descriptor, descritorSalvo);
+
                     if (distancia < melhorDistancia) {
                         melhorDistancia = distancia;
                         melhorMatch = worker;
                     }
-                } catch (e) {}
+                } catch (e) {
+                    console.error('Erro ao comparar:', e);
+                }
             }
 
             if (melhorMatch) {
                 const confianca = Math.round((1 - melhorDistancia) * 100);
                 trabalhadorAtivo = melhorMatch;
-                setMatchStatus('found', `✅ ${melhorMatch.nome} (${confianca}%)`, `Matrícula: ${melhorMatch.id}`);
 
-                // Flash de reconhecimento
+                matchName.textContent = melhorMatch.nome;
+                matchName.className = 'match-name found';
+                matchImg.src = melhorMatch.foto;
+                matchImg.className = 'match-photo found';
+                matchContainer.className = 'match-container found';
+                matchStatus.innerHTML = `
+                    <span class="dot dot-green"></span>
+                    ✅ IDENTIFICADO - ${melhorMatch.nome} (${confianca}%)
+                `;
+
                 recognitionFlash.classList.add('active');
-                setTimeout(() => recognitionFlash.classList.remove('active'), 400);
+                setTimeout(() => recognitionFlash.classList.remove('active'), 300);
 
                 tocarSom('reconhecido');
+
+                isScanning = true;
 
                 const pode = podeRegistrar(melhorMatch.id);
                 if (pode.pode) {
                     btnRegister.disabled = false;
-                    scanStatus.className = 'value online';
-                    scanStatus.textContent = '● Reconhecido';
-                    addLog(`Rosto reconhecido: ${melhorMatch.nome} (${confianca}%)`, 'success');
                 } else {
-                    setMatchStatus('registered', `⏳ ${melhorMatch.nome} já registrou`, `Próximo em ${pode.tempoRestante} minuto(s)`);
+                    matchName.textContent = melhorMatch.nome;
+                    matchName.className = 'match-name registered';
+                    matchImg.className = 'match-photo registered';
+                    matchContainer.className = 'match-container registered';
+                    matchStatus.innerHTML = `
+                        <span class="dot dot-yellow"></span>
+                        ⏳ JÁ REGISTRADO - Próximo em ${pode.tempoRestante} minuto(s)
+                    `;
                     btnRegister.disabled = true;
-                    scanStatus.className = 'value waiting';
-                    scanStatus.textContent = '● Já registrou';
-                    addLog(`${melhorMatch.nome} já registrou ponto`, 'warning');
+                    showToast(`⏱️ ${melhorMatch.nome} já registrou! Próximo em ${pode.tempoRestante} minuto(s)`, 'warning');
                 }
-                isScanning = true;
+
             } else {
-                setMatchStatus('not-found', '❌ Rosto não reconhecido', 'Tente novamente');
-                btnRegister.disabled = true;
-                scanStatus.className = 'value offline';
-                scanStatus.textContent = '● Não reconhecido';
+                matchContainer.className = 'match-container not-found';
+                matchName.className = 'match-name not-found';
+                matchName.textContent = '❌ Não Reconhecido';
+                matchImg.className = 'match-photo not-found';
+                matchImg.src =
+                    "data:image/svg+xml;utf8,<svg xmlns='http://w3.org' viewBox='0 0 24 24' fill='%23f43f5e'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/></svg>";
+                matchStatus.innerHTML = `
+                    <span class="dot dot-red"></span>
+                    ❌ ROSTO NÃO RECONHECIDO
+                `;
                 tocarSom('desconhecido');
-                addLog('Rosto não reconhecido', 'error');
+                btnRegister.disabled = true;
+                showToast('❌ Rosto não reconhecido!', 'error');
             }
         }
 
@@ -1296,90 +1681,49 @@
 
                 const hasFace = Math.random() > 0.4;
 
-                if (hasFace) {
+                if (hasFace && reconhecimentoAutomatico) {
                     rostoDetectado = true;
-                    scanStatus.className = 'value online';
-                    scanStatus.textContent = '● Rosto detectado';
 
                     const random = trabalhadores[Math.floor(Math.random() * trabalhadores.length)];
                     if (random) {
                         trabalhadorAtivo = random;
-                        setMatchStatus('found', `✅ ${random.nome}`, `Matrícula: ${random.id}`);
+
+                        matchName.textContent = random.nome;
+                        matchName.className = 'match-name found';
+                        matchImg.src = random.foto;
+                        matchImg.className = 'match-photo found';
+                        matchContainer.className = 'match-container found';
+                        matchStatus.innerHTML = `
+                            <span class="dot dot-green"></span>
+                            ✅ IDENTIFICADO - ${random.nome}
+                        `;
 
                         recognitionFlash.classList.add('active');
-                        setTimeout(() => recognitionFlash.classList.remove('active'), 400);
+                        setTimeout(() => recognitionFlash.classList.remove('active'), 300);
                         tocarSom('reconhecido');
+
+                        isScanning = true;
 
                         const pode = podeRegistrar(random.id);
                         if (pode.pode) {
                             btnRegister.disabled = false;
-                            scanStatus.className = 'value online';
-                            scanStatus.textContent = '● Reconhecido';
-                            addLog(`Rosto reconhecido (simulado): ${random.nome}`, 'success');
                         } else {
-                            setMatchStatus('registered', `⏳ ${random.nome} já registrou`, `Próximo em ${pode.tempoRestante} minuto(s)`);
+                            matchName.textContent = random.nome;
+                            matchName.className = 'match-name registered';
+                            matchImg.className = 'match-photo registered';
+                            matchContainer.className = 'match-container registered';
+                            matchStatus.innerHTML = `
+                                <span class="dot dot-yellow"></span>
+                                ⏳ JÁ REGISTRADO - Próximo em ${pode.tempoRestante} minuto(s)
+                            `;
                             btnRegister.disabled = true;
-                            scanStatus.className = 'value waiting';
-                            scanStatus.textContent = '● Já registrou';
-                            addLog(`${random.nome} já registrou ponto`, 'warning');
                         }
-                        isScanning = true;
                     }
                 } else {
                     rostoDetectado = false;
-                    if (!isScanning) {
-                        scanStatus.className = 'value waiting';
-                        scanStatus.textContent = '● Aguardando';
-                        resetMatch();
-                    }
+                    if (!isScanning) resetMatch();
                 }
             }, 1500);
-        }
-
-        // ============================================
-        // SET MATCH STATUS
-        // ============================================
-        function setMatchStatus(type, name, sub) {
-            const classes = {
-                'found': 'found',
-                'registered': 'registered',
-                'not-found': 'not-found',
-                'waiting': 'waiting'
-            };
-
-            const cls = classes[type] || 'waiting';
-            matchInfo.className = `match-info ${cls}`;
-            matchName.className = `name ${cls}`;
-            avatar.className = `avatar ${cls}`;
-            matchName.textContent = name;
-            matchSub.textContent = sub || '';
-        }
-
-        // ============================================
-        // RESET MATCH
-        // ============================================
-        function resetMatch() {
-            setMatchStatus('waiting', 'Procurando rosto...', 'Olhe diretamente para a câmera');
-            avatar.src = "data:image/svg+xml;utf8,<svg xmlns='http://w3.org' viewBox='0 0 24 24' fill='%23475569'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-4-8-4z'/></svg>";
-            btnRegister.disabled = true;
-            isScanning = false;
-            trabalhadorAtivo = null;
-            faceBox.className = 'face-box';
-        }
-
-        // ============================================
-        // VERIFICAR REGISTRO
-        // ============================================
-        function podeRegistrar(id) {
-            const intervalo = parseInt(document.getElementById('intervaloRegistro')?.value) || 5;
-            const agora = Date.now();
-            const ultimo = ultimoRegistro[id] || 0;
-            const diff = (agora - ultimo) / (1000 * 60);
-
-            if (diff < intervalo) {
-                return { pode: false, tempoRestante: Math.ceil(intervalo - diff) };
-            }
-            return { pode: true, tempoRestante: 0 };
         }
 
         // ============================================
@@ -1390,6 +1734,8 @@
                 showToast('⚠️ Nenhum rosto reconhecido!', 'error');
                 return;
             }
+
+            ultimoRegistro[trabalhadorAtivo.id] = Date.now();
 
             const canvas = document.createElement('canvas');
             canvas.width = 320;
@@ -1408,95 +1754,40 @@
                 matricula: trabalhadorAtivo.id,
                 horario: horario,
                 foto: foto,
-                turno: trabalhadorAtivo.turno || 'N/A'
+                turno: trabalhadorAtivo.turno || 'N/A',
+                departamento: trabalhadorAtivo.departamento || 'N/A'
             });
 
             transaction.oncomplete = function() {
-                ultimoRegistro[trabalhadorAtivo.id] = Date.now();
                 btnRegister.disabled = true;
-                setMatchStatus('registered', `✅ Ponto registrado!`, `${trabalhadorAtivo.nome} - ${horario}`);
-                showToast(`✅ Ponto registrado: ${trabalhadorAtivo.nome}`, 'success');
-                addLog(`Ponto registrado: ${trabalhadorAtivo.nome} - ${horario}`, 'success');
+                matchStatus.innerHTML = `
+                    <span class="dot dot-green"></span>
+                    ✅ PONTO REGISTRADO - ${horario}
+                `;
+                matchContainer.className = 'match-container found';
+                showToast(`✅ Ponto registrado: ${trabalhadorAtivo.nome} - ${horario}`, 'success');
                 carregarHistorico();
                 tocarSom('reconhecido');
-                scanStatus.className = 'value online';
-                scanStatus.textContent = '● Ponto registrado';
             };
         });
 
         // ============================================
-        // CADASTRAR BIOMETRIA
+        // RESET MATCH
         // ============================================
-        async function cadastrarBiometria() {
-            const name = document.getElementById('newName').value.trim();
-            const id = document.getElementById('newId').value.trim();
-            const dept = document.getElementById('newDept').value;
-            const turno = document.getElementById('newTurno').value;
-
-            if (!name || !id) {
-                showToast('⚠️ Preencha nome e matrícula', 'error');
-                addLog('Tentativa de cadastro sem nome ou matrícula', 'error');
-                return;
-            }
-
-            if (trabalhadores.some(w => w.id === id)) {
-                showToast('⚠️ Matrícula já cadastrada!', 'error');
-                addLog(`Tentativa de cadastro com matrícula duplicada: ${id}`, 'error');
-                return;
-            }
-
-            if (!rostoDetectado) {
-                showToast('⚠️ Posicione um rosto na câmera!', 'error');
-                addLog('Tentativa de cadastro sem rosto detectado', 'error');
-                return;
-            }
-
-            const canvas = document.createElement('canvas');
-            canvas.width = 160;
-            canvas.height = 120;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, 160, 120);
-            const foto = canvas.toDataURL('image/jpeg', 0.7);
-
-            let descritor = null;
-
-            if (faceapiReady) {
-                try {
-                    const detections = await faceapi.detectSingleFace(video)
-                        .withFaceLandmarks()
-                        .withFaceDescriptor();
-                    if (detections) {
-                        descritor = Array.from(detections.descriptor);
-                        addLog(`Descritor facial extraído para ${name}`, 'success');
-                    } else {
-                        addLog(`Nenhum rosto detectado para cadastro de ${name}`, 'warning');
-                    }
-                } catch (e) {
-                    addLog(`Erro ao extrair descritor para ${name}`, 'error');
-                }
-            }
-
-            const transaction = db.transaction(["trabalhadores"], "readwrite");
-            const store = transaction.objectStore("trabalhadores");
-
-            store.put({
-                id: id,
-                nome: name,
-                foto: foto,
-                descritor: descritor,
-                departamento: dept,
-                turno: turno,
-                dataCadastro: new Date().toISOString()
-            });
-
-            transaction.oncomplete = function() {
-                tocarSom('cadastrado');
-                showToast(`✅ ${name} cadastrado com sucesso!`, 'success');
-                addLog(`Colaborador ${name} (${id}) cadastrado com sucesso`, 'success');
-                document.getElementById('newName').value = '';
-                document.getElementById('newId').value = '';
-                carregarTrabalhadores();
-            };
+        function resetMatch() {
+            matchName.textContent = 'Aguardando...';
+            matchName.className = 'match-name';
+            matchImg.src =
+                "data:image/svg+xml;utf8,<svg xmlns='http://w3.org' viewBox='0 0 24 24' fill='%23475569'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-4-8-4z'/></svg>";
+            matchImg.className = 'match-photo';
+            matchContainer.className = 'match-container waiting';
+            matchStatus.innerHTML = `
+                <span class="dot dot-gray"></span>
+                Posicione o rosto na câmera
+            `;
+            isScanning = false;
+            rostoDetectado = false;
+            btnRegister.disabled = true;
         }
 
         // ============================================
@@ -1507,15 +1798,9 @@
             const transaction = db.transaction(["trabalhadores"], "readonly");
             const store = transaction.objectStore("trabalhadores");
             const requestAll = store.getAll();
-
             requestAll.onsuccess = function() {
                 trabalhadores = requestAll.result || [];
-                console.log(`👥 ${trabalhadores.length} trabalhadores cadastrados`);
-                if (trabalhadores.length === 0) {
-                    addLog('Nenhum colaborador cadastrado', 'warning');
-                } else {
-                    addLog(`${trabalhadores.length} colaboradores carregados`, 'info');
-                }
+                console.log(`👥 ${trabalhadores.length} trabalhadores`);
             };
         }
 
@@ -1536,7 +1821,7 @@
                 logCount.textContent = `${registros.length}`;
 
                 if (registros.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;color:var(--text-gray);padding:16px;">📭 Nenhum registro</td></tr>`;
+                    tbody.innerHTML = `<tr class="empty-row"><td colspan="4">📭 Nenhum registro</td></tr>`;
                     return;
                 }
 
@@ -1544,11 +1829,11 @@
                 const sorted = registros.reverse().slice(0, 30);
                 sorted.forEach(p => {
                     const row = document.createElement('tr');
-                    row.style.borderBottom = '1px solid var(--border-color)';
                     row.innerHTML = `
-                        <td style="padding:6px 8px;"><img src="${p.foto || 'data:image/svg+xml;utf8,<svg xmlns=%22http://w3.org%22 viewBox=%220 0 24 24%22 fill=%22%23475569%22><path d=%22M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-4-8-4z%22/></svg>'}" style="width:32px;height:28px;object-fit:cover;border-radius:4px;border:1px solid var(--border-color);"></td>
-                        <td style="padding:6px 8px;color:var(--text-light);"><strong>${p.nome || 'Desconhecido'}</strong></td>
-                        <td style="padding:6px 8px;color:var(--text-muted);">${p.horario || 'N/A'}</td>
+                        <td><img src="${p.foto || 'data:image/svg+xml;utf8,<svg xmlns=%22http://w3.org%22 viewBox=%220 0 24 24%22 fill=%22%23475569%22><path d=%22M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-4-8-4z%22/></svg>'}" class="photo-preview"></td>
+                        <td><strong>${p.nome || 'Desconhecido'}</strong></td>
+                        <td>${p.matricula || 'N/A'}</td>
+                        <td>${p.horario || p.data || 'N/A'}</td>
                     `;
                     tbody.appendChild(row);
                 });
@@ -1556,17 +1841,73 @@
         }
 
         // ============================================
-        // LIMPAR HISTÓRICO
+        // CADASTRAR BIOMETRIA
         // ============================================
-        function limparHistorico() {
-            if (!confirm('⚠️ Tem certeza que deseja limpar todo o histórico?')) return;
-            const transaction = db.transaction(["pontos"], "readwrite");
-            const store = transaction.objectStore("pontos");
-            store.clear().onsuccess = function() {
-                showToast('🗑️ Histórico limpo!', 'warning');
-                carregarHistorico();
-                ultimoRegistro = {};
-                addLog('Histórico limpo', 'warning');
+        async function cadastrarBiometria() {
+            const name = document.getElementById('newName').value.trim();
+            const id = document.getElementById('newId').value.trim();
+            const dept = document.getElementById('newDept').value;
+            const turno = document.getElementById('newTurno').value;
+
+            if (!name || !id) {
+                showToast('⚠️ Preencha nome e matrícula', 'error');
+                return;
+            }
+
+            if (trabalhadores.some(w => w.id === id)) {
+                showToast('⚠️ Matrícula já cadastrada!', 'error');
+                return;
+            }
+
+            if (!rostoDetectado) {
+                showToast('⚠️ Posicione um rosto na câmera!', 'error');
+                return;
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 160;
+            canvas.height = 120;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, 160, 120);
+            const foto = canvas.toDataURL('image/jpeg', 0.7);
+
+            let descritor = null;
+
+            if (faceapiReady) {
+                try {
+                    const detections = await faceapi.detectSingleFace(video)
+                        .withFaceLandmarks()
+                        .withFaceDescriptor();
+                    if (detections) {
+                        descritor = Array.from(detections.descriptor);
+                        showToast('🧠 Descritor facial extraído!', 'success');
+                    } else {
+                        showToast('⚠️ Nenhum rosto detectado. Cadastrando apenas foto.', 'warning');
+                    }
+                } catch (e) {
+                    console.error('Erro ao extrair descritor:', e);
+                }
+            }
+
+            const transaction = db.transaction(["trabalhadores"], "readwrite");
+            const store = transaction.objectStore("trabalhadores");
+
+            store.put({
+                id: id,
+                nome: name,
+                foto: foto,
+                descritor: descritor,
+                departamento: dept,
+                turno: turno,
+                dataCadastro: new Date().toISOString()
+            });
+
+            transaction.oncomplete = function() {
+                tocarSom('cadastrado');
+                showToast(`✅ ${name} cadastrado com sucesso!`, 'success');
+                document.getElementById('newName').value = '';
+                document.getElementById('newId').value = '';
+                carregarTrabalhadores();
             };
         }
 
@@ -1582,26 +1923,30 @@
                 const registros = requestAll.result;
 
                 if (registros.length === 0) {
-                    showToast('📭 Nenhum registro para exportar', 'warning');
+                    showToast('📭 Nenhum histórico para exportar', 'warning');
                     return;
                 }
 
                 const janela = window.open('', '_blank');
                 let html = `<!DOCTYPE html>
-                <html><head><title>Relatório de Ponto</title>
+                <html>
+                <head><title>Relatório de Ponto</title>
                 <style>
-                    body{font-family:Arial;padding:30px;color:#333;}
-                    .header{text-align:center;border-bottom:2px solid #111;padding-bottom:15px;margin-bottom:25px;}
-                    .header h1{margin:0;font-size:22px;color:#10b981;}
-                    table{width:100%;border-collapse:collapse;margin-top:15px;}
-                    th,td{border:1px solid #777;padding:10px;text-align:left;font-size:12px;}
-                    th{background:#eaeaea;}
-                    .photo-preview{width:40px;height:32px;object-fit:cover;border-radius:4px;}
-                    .footer{margin-top:40px;text-align:center;font-size:11px;color:#777;border-top:1px solid #ddd;padding-top:15px;}
+                    body { font-family: Arial; padding:30px; color:#333; }
+                    .header { text-align:center; border-bottom:2px solid #111; padding-bottom:15px; margin-bottom:25px; }
+                    .header h1 { margin:0; font-size:22px; text-transform:uppercase; }
+                    .header p { margin:5px 0 0; font-size:13px; color:#555; }
+                    table { width:100%; border-collapse:collapse; margin-top:15px; }
+                    th, td { border:1px solid #777; padding:10px; text-align:left; font-size:12px; }
+                    th { background:#eaeaea; font-weight:bold; }
+                    .photo-preview { width:50px; height:38px; object-fit:cover; border-radius:4px; }
+                    .footer { margin-top:50px; text-align:center; font-size:11px; color:#777; border-top:1px solid #ddd; padding-top:15px; }
+                    .total { font-weight:bold; font-size:14px; margin-top:10px; }
                 </style>
-                </head><body>
+                </head>
+                <body>
                     <div class="header">
-                        <h1>📋 Relatório de Ponto Facial</h1>
+                        <h1>📋 Relatório de Ponto Biométrico</h1>
                         <p>Emissão: ${new Date().toLocaleString('pt-BR')} | Total: ${registros.length} registros</p>
                     </div>
                     <table>
@@ -1618,20 +1963,19 @@
                 });
 
                 html += `</tbody></table>
-                    <div class="footer">Ponto Facial - Reconhecimento Local</div>
+                    <div class="total">📊 Total: ${registros.length}</div>
+                    <div class="footer">Ponto Biométrico Seguro v11.0</div>
                 </body></html>`;
 
                 janela.document.write(html);
                 janela.document.close();
                 janela.onload = function() { janela.print(); };
                 showToast('📄 PDF gerado!', 'success');
-                addLog('Relatório PDF exportado', 'success');
             };
         }
 
         function exportarRelatorioCompleto() {
             showToast('📊 Gerando relatório completo...', 'info');
-            addLog('Gerando relatório completo', 'info');
             setTimeout(() => { exportarPDF(); }, 500);
         }
 
@@ -1648,34 +1992,33 @@
                 }
 
                 let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
-                xml += `<PontoFacial>\n`;
-                xml += `  <Empresa>CONFEITARIA_COSTA</Empresa>\n`;
+                xml += `<OracleNewsSystems>\n`;
+                xml += `  <Empresa>CONFEITARIA_COSTA_001</Empresa>\n`;
                 xml += `  <DataGeracao>${new Date().toISOString()}</DataGeracao>\n`;
                 xml += `  <Registros>\n`;
 
                 registros.forEach(p => {
-                    xml += `    <Registro>\n`;
+                    xml += `    <PontoBiometrico>\n`;
                     xml += `      <Colaborador>${p.nome || 'Desconhecido'}</Colaborador>\n`;
                     xml += `      <Matricula>${p.matricula || 'N/A'}</Matricula>\n`;
-                    xml += `      <DataHora>${p.horario || 'N/A'}</DataHora>\n`;
+                    xml += `      <DataHora>${p.data || new Date().toISOString()}</DataHora>\n`;
                     xml += `      <Turno>${p.turno || 'N/A'}</Turno>\n`;
-                    xml += `    </Registro>\n`;
+                    xml += `    </PontoBiometrico>\n`;
                 });
 
                 xml += `  </Registros>\n`;
-                xml += `</PontoFacial>`;
+                xml += `</OracleNewsSystems>`;
 
                 const blob = new Blob([xml], { type: 'application/xml' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `ponto_facial_${Date.now()}.xml`;
+                a.download = `oracle_news_${Date.now()}.xml`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                showToast('📄 XML exportado!', 'success');
-                addLog('XML exportado com sucesso', 'success');
+                showToast('📄 XML Oracle exportado!', 'success');
             };
         }
 
@@ -1691,33 +2034,71 @@
                     return;
                 }
 
-                let csv = 'Colaborador,Matrícula,Data/Hora,Turno\n';
+                let csv = 'Colaborador,Matrícula,Data/Hora,Turno,Departamento\n';
                 registros.forEach(p => {
                     csv +=
-                        `${p.nome || 'Desconhecido'},${p.matricula || 'N/A'},${p.horario || 'N/A'},${p.turno || 'N/A'}\n`;
+                        `${p.nome || 'Desconhecido'},${p.matricula || 'N/A'},${p.horario || p.data || 'N/A'},${p.turno || 'N/A'},${p.departamento || 'N/A'}\n`;
                 });
 
                 const blob = new Blob([csv], { type: 'text/csv' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `ponto_facial_${Date.now()}.csv`;
+                a.download = `relatorio_ponto_${Date.now()}.csv`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
                 showToast('📊 CSV exportado!', 'success');
-                addLog('CSV exportado com sucesso', 'success');
             };
         }
 
         // ============================================
+        // LIMPAR HISTÓRICO
+        // ============================================
+        function limparHistorico() {
+            if (!confirm('⚠️ Tem certeza que deseja limpar todo o histórico?')) return;
+            const transaction = db.transaction(["pontos"], "readwrite");
+            const store = transaction.objectStore("pontos");
+            const requestClear = store.clear();
+            requestClear.onsuccess = function() {
+                showToast('🗑️ Histórico limpo!', 'warning');
+                carregarHistorico();
+                ultimoRegistro = {};
+            };
+        }
+
+        // ============================================
+        // KEYBOARD SHORTCUTS
+        // ============================================
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.config-section, .admin-section, .pdf-section').forEach(el => {
+                    el.style.display = 'none';
+                });
+                document.getElementById('mainSection').style.display = 'block';
+                document.querySelectorAll('.menu-dropdown .item').forEach(item => item.classList.remove('active'));
+                document.querySelectorAll('.menu-dropdown .item')[0]?.classList.add('active');
+                closeMenu();
+            }
+            if (e.key === 'r' || e.key === 'R') {
+                if (document.getElementById('adminSection').style.display === 'block') {
+                    cadastrarBiometria();
+                }
+            }
+            if (e.key === 'p' || e.key === 'P') {
+                exportarPDF();
+            }
+        });
+
+        // ============================================
         // INICIALIZAÇÃO
         // ============================================
-        console.log('🔒 Ponto Facial - Reconhecimento Local');
-        console.log('📌 Clique 3 vezes no título "PONTO FACIAL" para ADM');
-        console.log('📸 Posicione o rosto na câmera para reconhecimento');
-        addLog('Sistema pronto para uso', 'success');
+        console.log('🔒 Ponto Biométrico Seguro v11.0');
+        console.log('📌 Clique 3 vezes no logo para ADM');
+        console.log('⌨️ ESC = fechar menus | R = cadastrar | P = PDF');
+        console.log('🔊 Sons mais altos ativados!');
+        console.log('✅ Reconhecimento facial REAL com FaceAPI.js');
     </script>
 
 </body>
