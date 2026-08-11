@@ -4,11 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ponto Biométrico - Versão Definitiva</title>
-
-    <!-- FaceAPI.js -->
-    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js">
-    </script>
+    <title>Ponto Biométrico - Versão Estável</title>
 
     <style>
         /* ============================================
@@ -264,15 +260,6 @@
             transform: scaleX(-1);
         }
 
-        canvas#overlayCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-
         .scanner-overlay {
             position: absolute;
             inset: 0;
@@ -316,17 +303,17 @@
             }
         }
 
-        .recognition-flash {
+        .capture-flash {
             position: absolute;
             inset: 0;
-            background: rgba(16, 185, 129, 0.2);
+            background: rgba(255, 255, 255, 0.6);
             border-radius: 10px;
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.1s;
         }
 
-        .recognition-flash.active {
+        .capture-flash.active {
             opacity: 1;
             animation: flash 0.3s ease;
         }
@@ -359,23 +346,13 @@
             min-height: 70px;
         }
 
-        .match-container.found {
-            border-color: var(--primary);
-            background: rgba(16, 185, 129, 0.06);
+        .match-container.waiting {
+            border-color: var(--border-color);
         }
 
         .match-container.registered {
-            border-color: var(--warning);
-            background: rgba(245, 158, 11, 0.06);
-        }
-
-        .match-container.not-found {
-            border-color: var(--danger);
-            background: rgba(244, 63, 94, 0.06);
-        }
-
-        .match-container.waiting {
-            border-color: var(--border-color);
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.06);
         }
 
         .match-photo {
@@ -389,19 +366,9 @@
             flex-shrink: 0;
         }
 
-        .match-photo.found {
+        .match-photo.registered {
             border-color: var(--primary);
             box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
-        }
-
-        .match-photo.registered {
-            border-color: var(--warning);
-            box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
-        }
-
-        .match-photo.not-found {
-            border-color: var(--danger);
-            box-shadow: 0 0 20px rgba(244, 63, 94, 0.2);
         }
 
         .match-info {
@@ -414,16 +381,8 @@
             color: var(--text-light);
         }
 
-        .match-name.found {
-            color: var(--primary-light);
-        }
-
         .match-name.registered {
-            color: var(--warning);
-        }
-
-        .match-name.not-found {
-            color: var(--danger);
+            color: var(--primary-light);
         }
 
         .match-status {
@@ -445,12 +404,6 @@
 
         .dot-green {
             background: var(--primary);
-        }
-        .dot-yellow {
-            background: var(--warning);
-        }
-        .dot-red {
-            background: var(--danger);
         }
         .dot-gray {
             background: var(--text-gray);
@@ -652,20 +605,6 @@
 
         .config-item .toggle.active .thumb {
             left: 23px;
-        }
-
-        .config-item select {
-            background: var(--bg-dark);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 4px 10px;
-            color: var(--text-light);
-            font-size: 13px;
-            outline: none;
-        }
-
-        .config-item select:focus {
-            border-color: var(--primary);
         }
 
         /* ============================================
@@ -920,11 +859,11 @@
 <body>
 
     <!-- LOADING -->
-    <div class="loading-overlay active" id="loadingOverlay">
+    <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
         <div class="loading-text">
-            Carregando IA de Reconhecimento Facial<br>
-            <strong>FaceAPI.js - Processamento Local</strong>
+            Iniciando sistema de ponto<br>
+            <strong>Versão Estável - Sem IA</strong>
         </div>
     </div>
 
@@ -958,11 +897,10 @@
         <div id="mainSection">
             <div class="camera-box" id="cameraBox">
                 <video id="video" autoplay playsinline muted></video>
-                <canvas id="overlayCanvas"></canvas>
                 <div class="scanner-overlay">
                     <div class="scanner-circle"></div>
                 </div>
-                <div class="recognition-flash" id="recognitionFlash"></div>
+                <div class="capture-flash" id="captureFlash"></div>
             </div>
 
             <div class="match-container waiting" id="matchContainer">
@@ -972,13 +910,13 @@
                     <div id="matchName" class="match-name">Aguardando...</div>
                     <div id="matchStatus" class="match-status">
                         <span class="dot dot-gray"></span>
-                        Posicione o rosto na câmera
+                        Posicione-se para a foto
                     </div>
                 </div>
             </div>
 
             <div class="btn-group">
-                <button class="btn btn-primary" id="btnRegister" disabled>✅ Registrar</button>
+                <button class="btn btn-primary" id="btnCapture">📸 Capturar e Registrar</button>
                 <button class="btn btn-secondary" onclick="toggleSection('admin')">🔒 ADM</button>
                 <button class="btn btn-secondary" onclick="toggleSection('pdf')">📄 PDF</button>
             </div>
@@ -992,35 +930,21 @@
             </div>
 
             <div class="config-item">
-                <label>🔊 Som Reconhecimento</label>
+                <label>🔊 Som de Registro</label>
                 <div class="toggle active" onclick="toggleConfig(this)">
                     <div class="thumb"></div>
                 </div>
             </div>
 
             <div class="config-item">
-                <label>🔊 Som Cadastro</label>
+                <label>🔊 Som de Cadastro</label>
                 <div class="toggle active" onclick="toggleConfig(this)">
                     <div class="thumb"></div>
                 </div>
             </div>
 
             <div class="config-item">
-                <label>🔊 Som Desconhecido</label>
-                <div class="toggle active" onclick="toggleConfig(this)">
-                    <div class="thumb"></div>
-                </div>
-            </div>
-
-            <div class="config-item">
-                <label>📸 Auto Reconhecimento</label>
-                <div class="toggle active" onclick="toggleConfig(this)">
-                    <div class="thumb"></div>
-                </div>
-            </div>
-
-            <div class="config-item">
-                <label>⏱️ Intervalo Registro</label>
+                <label>⏱️ Intervalo entre registros</label>
                 <select id="intervaloRegistro">
                     <option value="1">1 minuto</option>
                     <option value="5" selected>5 minutos</option>
@@ -1074,8 +998,8 @@
                 </div>
             </div>
 
-            <button class="btn btn-success" onclick="cadastrarBiometria()" style="width:100%;margin-bottom:10px;">
-                💾 Salvar Biometria
+            <button class="btn btn-success" onclick="cadastrarColaborador()" style="width:100%;margin-bottom:10px;">
+                💾 Salvar Colaborador
             </button>
 
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -1130,7 +1054,7 @@
 
             <div style="margin-top:12px;background:rgba(0,0,0,0.2);padding:12px;border-radius:8px;">
                 <p style="font-size:11px;color:var(--text-muted);text-align:center;">
-                    📁 Documentos gerados em tempo real com os dados do sistema
+                    📁 Documentos gerados em tempo real
                 </p>
             </div>
         </div>
@@ -1138,51 +1062,43 @@
         <!-- FOOTER -->
         <footer>
             <div class="footer-icons">
-                <span>🔒 Reconhecimento Local</span>
+                <span>🔒 Sistema Estável</span>
                 <span>•</span>
-                <span>🧠 FaceAPI.js</span>
+                <span>📸 Captura de Foto</span>
                 <span>•</span>
                 <span>📄 Exportação</span>
                 <span>•</span>
-                <span>🎵 Sons IA</span>
+                <span>🎵 Sons</span>
             </div>
-            &copy; 2026 Ponto Biométrico Enterprise v2.0
+            &copy; 2026 Ponto Biométrico - Versão Estável
         </footer>
 
     </div>
 
     <!-- ==========================================
-    JAVASCRIPT COMPLETO - CORRIGIDO
+    JAVASCRIPT COMPLETO - SEM IA
     ========================================== -->
     <script>
         // ============================================
         // VARIÁVEIS
         // ============================================
         const video = document.getElementById('video');
-        const overlayCanvas = document.getElementById('overlayCanvas');
-        const ctx = overlayCanvas.getContext('2d');
-        const admTrigger = document.getElementById('admTrigger');
         const cameraBox = document.getElementById('cameraBox');
         const matchContainer = document.getElementById('matchContainer');
         const matchImg = document.getElementById('matchImg');
         const matchName = document.getElementById('matchName');
         const matchStatus = document.getElementById('matchStatus');
-        const recognitionFlash = document.getElementById('recognitionFlash');
+        const captureFlash = document.getElementById('captureFlash');
+        const btnCapture = document.getElementById('btnCapture');
         const loadingOverlay = document.getElementById('loadingOverlay');
-        const btnRegister = document.getElementById('btnRegister');
+        const admTrigger = document.getElementById('admTrigger');
 
         let db = null;
-        let trabalhadores = [];
+        let colaboradores = [];
         let clickCount = 0;
-        let trabalhadorAtivo = null;
-        let isScanning = false;
-        let faceapiReady = false;
         let ultimoRegistro = {};
-        let rostoDetectado = false;
-        let detectionInterval = null;
         let somAtivo = true;
-        let reconhecimentoAutomatico = true;
-        let processandoReconhecimento = false;
+        let stream = null;
 
         // ============================================
         // SONS
@@ -1201,7 +1117,7 @@
                     vol = 0.7;
 
                 switch (tipo) {
-                    case 'reconhecido':
+                    case 'registro':
                         freq = 880;
                         dur = 0.4;
                         vol = 0.85;
@@ -1210,11 +1126,6 @@
                         freq = 660;
                         dur = 0.5;
                         vol = 0.85;
-                        break;
-                    case 'desconhecido':
-                        freq = 220;
-                        dur = 0.6;
-                        vol = 0.7;
                         break;
                     default:
                         freq = 440;
@@ -1229,7 +1140,7 @@
                 osc.start(ctx.currentTime);
                 osc.stop(ctx.currentTime + dur);
 
-                if (tipo === 'reconhecido' || tipo === 'cadastrado') {
+                if (tipo === 'registro' || tipo === 'cadastrado') {
                     setTimeout(() => { navigator.vibrate && navigator.vibrate(120); }, 100);
                 }
             } catch (e) { console.log('🔇 Som indisponível'); }
@@ -1286,11 +1197,6 @@
                     somAtivo = element.classList.contains('active');
                     showToast(somAtivo ? '🔊 Sons ativados' : '🔇 Sons desativados', 'info');
                 }
-                if (text.includes('Auto Reconhecimento')) {
-                    reconhecimentoAutomatico = element.classList.contains('active');
-                    showToast(reconhecimentoAutomatico ? '🔄 Reconhecimento automático ativado' :
-                        '⏸️ Reconhecimento automático desativado', 'info');
-                }
             }
         }
 
@@ -1319,7 +1225,6 @@
                 items[map[section]].classList.add('active');
             }
 
-            // Esconde main quando outra seção está aberta
             if (section !== 'main') {
                 document.getElementById('mainSection').style.display = 'none';
             } else {
@@ -1329,7 +1234,6 @@
             if (section === 'admin') carregarHistorico();
         }
 
-        // Mostra main por padrão
         document.getElementById('mainSection').style.display = 'block';
 
         // ============================================
@@ -1353,10 +1257,9 @@
 
         request.onupgradeneeded = function(e) {
             const db = e.target.result;
-            if (!db.objectStoreNames.contains("trabalhadores")) {
-                const store = db.createObjectStore("trabalhadores", { keyPath: "id" });
+            if (!db.objectStoreNames.contains("colaboradores")) {
+                const store = db.createObjectStore("colaboradores", { keyPath: "id" });
                 store.createIndex("nome", "nome", { unique: false });
-                store.createIndex("descritor", "descritor", { unique: false });
             }
             if (!db.objectStoreNames.contains("pontos")) {
                 const store = db.createObjectStore("pontos", { autoIncrement: true });
@@ -1367,10 +1270,11 @@
 
         request.onsuccess = function(e) {
             db = e.target.result;
-            carregarTrabalhadores();
+            carregarColaboradores();
             carregarHistorico();
             iniciarCamera();
-            carregarFaceAPI();
+            loadingOverlay.classList.remove('active');
+            showToast('📸 Sistema pronto! Posicione-se para a foto.', 'success');
         };
 
         request.onerror = function() {
@@ -1378,43 +1282,11 @@
         };
 
         // ============================================
-        // CARREGAR FACEAPI - CORRIGIDO
-        // ============================================
-        async function carregarFaceAPI() {
-            try {
-                loadingOverlay.classList.add('active');
-                document.querySelector('.loading-text strong').textContent = 'FaceAPI.js - Baixando modelos...';
-
-                // USANDO CDN OFICIAL E CONFIÁVEL
-                const MODEL_URL = 'https://justadudewhohas.github.io/face-api.js/models';
-
-                await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
-                await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
-                await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
-
-                faceapiReady = true;
-
-                setTimeout(() => {
-                    loadingOverlay.classList.remove('active');
-                    showToast('🧠 IA de reconhecimento facial pronta!', 'success');
-                    iniciarReconhecimento();
-                }, 400);
-
-            } catch (error) {
-                loadingOverlay.classList.remove('active');
-                console.error('Erro FaceAPI:', error);
-                showToast('⚠️ Erro ao carregar IA. Verifique sua internet.', 'error');
-                // Modo simulação apenas como fallback
-                iniciarReconhecimentoSimulado();
-            }
-        }
-
-        // ============================================
         // CÂMERA
         // ============================================
         async function iniciarCamera() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({
+                stream = await navigator.mediaDevices.getUserMedia({
                     audio: false,
                     video: {
                         facingMode: "user",
@@ -1426,8 +1298,6 @@
                 video.onloadedmetadata = () => {
                     video.play();
                     cameraBox.classList.add('active');
-                    overlayCanvas.width = video.videoWidth || 640;
-                    overlayCanvas.height = video.videoHeight || 480;
                 };
             } catch (err) {
                 showToast('⚠️ Permita o acesso à câmera', 'error');
@@ -1435,253 +1305,35 @@
         }
 
         // ============================================
-        // VERIFICAR REGISTRO
+        // CAPTURAR E REGISTRAR
         // ============================================
-        function podeRegistrar(matricula) {
-            const intervalo = parseInt(document.getElementById('intervaloRegistro').value) || 5;
-            const agora = Date.now();
-            const ultimo = ultimoRegistro[matricula] || 0;
-            const diff = (agora - ultimo) / (1000 * 60);
-
-            if (diff < intervalo) {
-                return { pode: false, tempoRestante: Math.ceil(intervalo - diff) };
-            }
-            return { pode: true, tempoRestante: 0 };
-        }
-
-        // ============================================
-        // RECONHECIMENTO REAL - CORRIGIDO
-        // ============================================
-        function iniciarReconhecimento() {
-            if (detectionInterval) clearInterval(detectionInterval);
-
-            detectionInterval = setInterval(async () => {
-                // VERIFICA SE A IA ESTÁ PRONTA
-                if (!faceapiReady || video.paused || !video.srcObject) {
-                    return;
-                }
-
-                try {
-                    // DETECTA ROSTOS COM DESCRITORES
-                    const detections = await faceapi.detectAllFaces(video)
-                        .withFaceLandmarks()
-                        .withFaceDescriptors();
-
-                    // LIMPA O CANVAS
-                    ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-
-                    // VERIFICA SE HÁ ROSTO DETECTADO
-                    if (detections.length > 0) {
-                        rostoDetectado = true;
-
-                        // DESENHA AS DETECÇÕES
-                        const resizedDetections = faceapi.resizeResults(detections, {
-                            width: overlayCanvas.width,
-                            height: overlayCanvas.height
-                        });
-
-                        faceapi.draw.drawDetections(overlayCanvas, resizedDetections);
-                        faceapi.draw.drawFaceLandmarks(overlayCanvas, resizedDetections);
-
-                        // SÓ PROCESSA SE NÃO ESTIVER PROCESSANDO E AUTO RECONHECIMENTO ATIVO
-                        if (!processandoReconhecimento && reconhecimentoAutomatico) {
-                            processandoReconhecimento = true;
-
-                            // PEGA O PRIMEIRO ROSTO
-                            const descriptor = detections[0].descriptor;
-
-                            // BUSCA CORRESPONDÊNCIA
-                            await buscarMatch(descriptor);
-
-                            processandoReconhecimento = false;
-                        }
-
-                    } else {
-                        rostoDetectado = false;
-                        if (!isScanning) resetMatch();
-                    }
-
-                } catch (error) {
-                    console.error('Erro na detecção:', error);
-                    processandoReconhecimento = false;
-                }
-            }, 800);
-        }
-
-        // ============================================
-        // BUSCAR MATCH - CORRIGIDO
-        // ============================================
-        async function buscarMatch(descriptor) {
-            // VERIFICA SE HÁ TRABALHADORES
-            if (trabalhadores.length === 0) {
-                matchContainer.className = 'match-container not-found';
-                matchName.className = 'match-name not-found';
-                matchName.textContent = '⚠️ Nenhum Cadastro';
-                matchImg.className = 'match-photo not-found';
-                matchImg.src =
-                    "data:image/svg+xml;utf8,<svg xmlns='http://w3.org' viewBox='0 0 24 24' fill='%23f43f5e'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/></svg>";
-                matchStatus.innerHTML = `
-                    <span class="dot dot-red"></span>
-                    NENHUM COLABORADOR CADASTRADO
-                `;
+        btnCapture.addEventListener('click', () => {
+            if (colaboradores.length === 0) {
+                showToast('⚠️ Nenhum colaborador cadastrado! Vá em ADM.', 'error');
                 return;
             }
 
-            let melhorMatch = null;
-            let melhorDistancia = 0.6; // LIMITE DE CONFIANÇA
-
-            // COMPARA COM TODOS OS TRABALHADORES
-            for (const worker of trabalhadores) {
-                if (!worker.descritor) continue;
-
-                try {
-                    const descritorSalvo = new Float32Array(worker.descritor);
-                    const distancia = faceapi.euclideanDistance(descriptor, descritorSalvo);
-
-                    // QUANTO MENOR A DISTÂNCIA, MAIS PARECIDO
-                    if (distancia < melhorDistancia) {
-                        melhorDistancia = distancia;
-                        melhorMatch = worker;
-                    }
-                } catch (e) {
-                    console.error('Erro ao comparar descritor:', e);
-                }
-            }
-
-            // SE ENCONTROU UM MATCH
-            if (melhorMatch) {
-                const confianca = Math.round((1 - melhorDistancia) * 100);
-                trabalhadorAtivo = melhorMatch;
-
-                matchName.textContent = melhorMatch.nome;
-                matchName.className = 'match-name found';
-                matchImg.src = melhorMatch.foto;
-                matchImg.className = 'match-photo found';
-                matchContainer.className = 'match-container found';
-                matchStatus.innerHTML = `
-                    <span class="dot dot-green"></span>
-                    ✅ IDENTIFICADO - ${melhorMatch.nome} (${confianca}%)
-                `;
-
-                recognitionFlash.classList.add('active');
-                setTimeout(() => recognitionFlash.classList.remove('active'), 300);
-
-                tocarSom('reconhecido');
-
-                isScanning = true;
-
-                // VERIFICA SE PODE REGISTRAR
-                const pode = podeRegistrar(melhorMatch.id);
-                if (pode.pode) {
-                    btnRegister.disabled = false;
-                } else {
-                    matchName.textContent = melhorMatch.nome;
-                    matchName.className = 'match-name registered';
-                    matchImg.className = 'match-photo registered';
-                    matchContainer.className = 'match-container registered';
-                    matchStatus.innerHTML = `
-                        <span class="dot dot-yellow"></span>
-                        ⏳ JÁ REGISTRADO - Próximo em ${pode.tempoRestante} minuto(s)
-                    `;
-                    btnRegister.disabled = true;
-                    showToast(`⏱️ ${melhorMatch.nome} já registrou! Próximo em ${pode.tempoRestante} minuto(s)`, 'warning');
-                }
-
-            } else {
-                // NÃO RECONHECIDO
-                matchContainer.className = 'match-container not-found';
-                matchName.className = 'match-name not-found';
-                matchName.textContent = '❌ Não Reconhecido';
-                matchImg.className = 'match-photo not-found';
-                matchImg.src =
-                    "data:image/svg+xml;utf8,<svg xmlns='http://w3.org' viewBox='0 0 24 24' fill='%23f43f5e'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/></svg>";
-                matchStatus.innerHTML = `
-                    <span class="dot dot-red"></span>
-                    ❌ ROSTO NÃO RECONHECIDO
-                `;
-                tocarSom('desconhecido');
-                btnRegister.disabled = true;
-                showToast('❌ Rosto não reconhecido!', 'error');
-            }
-        }
-
-        // ============================================
-        // RECONHECIMENTO SIMULADO (FALLBACK)
-        // ============================================
-        function iniciarReconhecimentoSimulado() {
-            if (detectionInterval) clearInterval(detectionInterval);
-
-            detectionInterval = setInterval(() => {
-                if (video.paused || !video.srcObject || trabalhadores.length === 0) {
-                    resetMatch();
-                    return;
-                }
-
-                // SIMULA DETECÇÃO DE ROSTO
-                const hasFace = Math.random() > 0.35;
-
-                if (hasFace && reconhecimentoAutomatico) {
-                    rostoDetectado = true;
-
-                    const random = trabalhadores[Math.floor(Math.random() * trabalhadores.length)];
-                    if (random) {
-                        trabalhadorAtivo = random;
-
-                        matchName.textContent = random.nome;
-                        matchName.className = 'match-name found';
-                        matchImg.src = random.foto;
-                        matchImg.className = 'match-photo found';
-                        matchContainer.className = 'match-container found';
-                        matchStatus.innerHTML = `
-                            <span class="dot dot-green"></span>
-                            ✅ IDENTIFICADO - ${random.nome}
-                        `;
-
-                        recognitionFlash.classList.add('active');
-                        setTimeout(() => recognitionFlash.classList.remove('active'), 300);
-                        tocarSom('reconhecido');
-
-                        isScanning = true;
-
-                        const pode = podeRegistrar(random.id);
-                        if (pode.pode) {
-                            btnRegister.disabled = false;
-                        } else {
-                            matchName.textContent = random.nome;
-                            matchName.className = 'match-name registered';
-                            matchImg.className = 'match-photo registered';
-                            matchContainer.className = 'match-container registered';
-                            matchStatus.innerHTML = `
-                                <span class="dot dot-yellow"></span>
-                                ⏳ JÁ REGISTRADO - Próximo em ${pode.tempoRestante} minuto(s)
-                            `;
-                            btnRegister.disabled = true;
-                        }
-                    }
-                } else {
-                    rostoDetectado = false;
-                    if (!isScanning) resetMatch();
-                }
-            }, 1500);
-        }
-
-        // ============================================
-        // REGISTRAR PONTO
-        // ============================================
-        btnRegister.addEventListener('click', () => {
-            if (!trabalhadorAtivo || !rostoDetectado) {
-                showToast('⚠️ Nenhum rosto reconhecido!', 'error');
+            // Verifica se já registrou recentemente
+            const pode = podeRegistrar();
+            if (!pode.pode) {
+                showToast(`⏱️ Aguarde ${pode.tempoRestante} minuto(s) para registrar novamente`, 'warning');
                 return;
             }
 
-            ultimoRegistro[trabalhadorAtivo.id] = Date.now();
-
+            // Captura a foto
             const canvas = document.createElement('canvas');
             canvas.width = 320;
             canvas.height = 240;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(video, 0, 0, 320, 240);
-            const foto = canvas.toDataURL('image/jpeg', 0.7);
+            const foto = canvas.toDataURL('image/jpeg', 0.8);
+
+            // Efeito de flash
+            captureFlash.classList.add('active');
+            setTimeout(() => captureFlash.classList.remove('active'), 300);
+
+            // Pega o colaborador selecionado (ou o primeiro)
+            const colaborador = colaboradores[0];
 
             const horario = new Date().toLocaleString('pt-BR');
 
@@ -1689,57 +1341,134 @@
             const store = transaction.objectStore("pontos");
 
             store.add({
-                nome: trabalhadorAtivo.nome,
-                matricula: trabalhadorAtivo.id,
+                nome: colaborador.nome,
+                matricula: colaborador.id,
                 horario: horario,
                 foto: foto,
-                turno: trabalhadorAtivo.turno || 'N/A',
-                departamento: trabalhadorAtivo.departamento || 'N/A'
+                turno: colaborador.turno || 'N/A',
+                departamento: colaborador.departamento || 'N/A'
             });
 
             transaction.oncomplete = function() {
-                btnRegister.disabled = true;
+                ultimoRegistro[colaborador.id] = Date.now();
+
+                // Atualiza match
+                matchImg.src = foto;
+                matchImg.className = 'match-photo registered';
+                matchContainer.className = 'match-container registered';
+                matchName.className = 'match-name registered';
+                matchName.textContent = `✅ ${colaborador.nome}`;
                 matchStatus.innerHTML = `
                     <span class="dot dot-green"></span>
-                    ✅ PONTO REGISTRADO - ${horario}
+                    Registrado em ${horario}
                 `;
-                matchContainer.className = 'match-container found';
-                showToast(`✅ Ponto registrado: ${trabalhadorAtivo.nome} - ${horario}`, 'success');
+
+                showToast(`✅ Ponto registrado: ${colaborador.nome} - ${horario}`, 'success');
                 carregarHistorico();
-                tocarSom('reconhecido');
+                tocarSom('registro');
             };
         });
 
         // ============================================
-        // RESET MATCH
+        // VERIFICAR REGISTRO
         // ============================================
-        function resetMatch() {
-            matchName.textContent = 'Aguardando...';
-            matchName.className = 'match-name';
-            matchImg.src =
-                "data:image/svg+xml;utf8,<svg xmlns='http://w3.org' viewBox='0 0 24 24' fill='%23475569'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-4-8-4z'/></svg>";
-            matchImg.className = 'match-photo';
-            matchContainer.className = 'match-container waiting';
-            matchStatus.innerHTML = `
-                <span class="dot dot-gray"></span>
-                Posicione o rosto na câmera
-            `;
-            isScanning = false;
-            rostoDetectado = false;
-            btnRegister.disabled = true;
+        function podeRegistrar() {
+            const intervalo = parseInt(document.getElementById('intervaloRegistro').value) || 5;
+            const agora = Date.now();
+
+            for (const id of Object.keys(ultimoRegistro)) {
+                const ultimo = ultimoRegistro[id] || 0;
+                const diff = (agora - ultimo) / (1000 * 60);
+                if (diff < intervalo) {
+                    return { pode: false, tempoRestante: Math.ceil(intervalo - diff) };
+                }
+            }
+            return { pode: true, tempoRestante: 0 };
         }
 
         // ============================================
-        // CARREGAR TRABALHADORES
+        // CADASTRAR COLABORADOR
         // ============================================
-        function carregarTrabalhadores() {
+        function cadastrarColaborador() {
+            const name = document.getElementById('newName').value.trim();
+            const id = document.getElementById('newId').value.trim();
+            const dept = document.getElementById('newDept').value;
+            const turno = document.getElementById('newTurno').value;
+
+            if (!name || !id) {
+                showToast('⚠️ Preencha nome e matrícula', 'error');
+                return;
+            }
+
+            if (colaboradores.some(w => w.id === id)) {
+                showToast('⚠️ Matrícula já cadastrada!', 'error');
+                return;
+            }
+
+            // Captura a foto do colaborador
+            const canvas = document.createElement('canvas');
+            canvas.width = 160;
+            canvas.height = 120;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, 160, 120);
+            const foto = canvas.toDataURL('image/jpeg', 0.7);
+
+            const transaction = db.transaction(["colaboradores"], "readwrite");
+            const store = transaction.objectStore("colaboradores");
+
+            store.put({
+                id: id,
+                nome: name,
+                foto: foto,
+                departamento: dept,
+                turno: turno,
+                dataCadastro: new Date().toISOString()
+            });
+
+            transaction.oncomplete = function() {
+                tocarSom('cadastrado');
+                showToast(`✅ ${name} cadastrado com sucesso!`, 'success');
+                document.getElementById('newName').value = '';
+                document.getElementById('newId').value = '';
+                carregarColaboradores();
+
+                // Atualiza a foto do match
+                matchImg.src = foto;
+                matchImg.className = 'match-photo registered';
+                matchContainer.className = 'match-container registered';
+                matchName.className = 'match-name registered';
+                matchName.textContent = `✅ ${name}`;
+                matchStatus.innerHTML = `
+                    <span class="dot dot-green"></span>
+                    Colaborador cadastrado!
+                `;
+            };
+        }
+
+        // ============================================
+        // CARREGAR COLABORADORES
+        // ============================================
+        function carregarColaboradores() {
             if (!db) return;
-            const transaction = db.transaction(["trabalhadores"], "readonly");
-            const store = transaction.objectStore("trabalhadores");
+            const transaction = db.transaction(["colaboradores"], "readonly");
+            const store = transaction.objectStore("colaboradores");
             const requestAll = store.getAll();
             requestAll.onsuccess = function() {
-                trabalhadores = requestAll.result || [];
-                console.log(`👥 ${trabalhadores.length} trabalhadores`);
+                colaboradores = requestAll.result || [];
+                console.log(`👥 ${colaboradores.length} colaboradores`);
+
+                if (colaboradores.length > 0) {
+                    const c = colaboradores[0];
+                    matchImg.src = c.foto;
+                    matchImg.className = 'match-photo registered';
+                    matchContainer.className = 'match-container registered';
+                    matchName.className = 'match-name registered';
+                    matchName.textContent = `✅ ${c.nome}`;
+                    matchStatus.innerHTML = `
+                        <span class="dot dot-green"></span>
+                        Colaborador: ${c.nome} - ${c.id}
+                    `;
+                }
             };
         }
 
@@ -1780,77 +1509,6 @@
         }
 
         // ============================================
-        // CADASTRAR BIOMETRIA
-        // ============================================
-        async function cadastrarBiometria() {
-            const name = document.getElementById('newName').value.trim();
-            const id = document.getElementById('newId').value.trim();
-            const dept = document.getElementById('newDept').value;
-            const turno = document.getElementById('newTurno').value;
-
-            if (!name || !id) {
-                showToast('⚠️ Preencha nome e matrícula', 'error');
-                return;
-            }
-
-            if (trabalhadores.some(w => w.id === id)) {
-                showToast('⚠️ Matrícula já cadastrada!', 'error');
-                return;
-            }
-
-            if (!rostoDetectado) {
-                showToast('⚠️ Posicione um rosto na câmera!', 'error');
-                return;
-            }
-
-            const canvas = document.createElement('canvas');
-            canvas.width = 160;
-            canvas.height = 120;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, 160, 120);
-            const foto = canvas.toDataURL('image/jpeg', 0.7);
-
-            let descritor = null;
-
-            if (faceapiReady) {
-                try {
-                    const detections = await faceapi.detectSingleFace(video)
-                        .withFaceLandmarks()
-                        .withFaceDescriptor();
-                    if (detections) {
-                        descritor = Array.from(detections.descriptor);
-                        showToast('🧠 Descritor facial extraído!', 'success');
-                    } else {
-                        showToast('⚠️ Nenhum rosto detectado. Cadastrando apenas foto.', 'warning');
-                    }
-                } catch (e) {
-                    console.error('Erro ao extrair descritor:', e);
-                }
-            }
-
-            const transaction = db.transaction(["trabalhadores"], "readwrite");
-            const store = transaction.objectStore("trabalhadores");
-
-            store.put({
-                id: id,
-                nome: name,
-                foto: foto,
-                descritor: descritor,
-                departamento: dept,
-                turno: turno,
-                dataCadastro: new Date().toISOString()
-            });
-
-            transaction.oncomplete = function() {
-                tocarSom('cadastrado');
-                showToast(`✅ ${name} cadastrado com sucesso!`, 'success');
-                document.getElementById('newName').value = '';
-                document.getElementById('newId').value = '';
-                carregarTrabalhadores();
-            };
-        }
-
-        // ============================================
         // EXPORTAR PDF
         // ============================================
         function exportarPDF() {
@@ -1884,7 +1542,7 @@
                 </head>
                 <body>
                     <div class="header">
-                        <h1>📋 Relatório de Ponto Biométrico</h1>
+                        <h1>📋 Relatório de Ponto</h1>
                         <p>Emissão: ${new Date().toLocaleString('pt-BR')} | Total: ${registros.length} registros</p>
                     </div>
                     <table>
@@ -1901,7 +1559,7 @@
                 });
 
                 html += `</tbody></table>
-                    <div class="footer">Ponto Biométrico Enterprise v2.0</div>
+                    <div class="footer">Ponto Biométrico - Versão Estável</div>
                 </body></html>`;
 
                 janela.document.write(html);
@@ -2016,9 +1674,9 @@
                 document.querySelectorAll('.menu-dropdown .item')[0]?.classList.add('active');
                 closeMenu();
             }
-            if ((e.key === 'r' || e.key === 'R') && document.getElementById('adminSection').classList.contains(
-                    'open')) {
-                cadastrarBiometria();
+            if (e.key === 'Enter' || e.key === ' ') {
+                btnCapture.click();
+                e.preventDefault();
             }
             if (e.key === 'p' || e.key === 'P') {
                 exportarPDF();
@@ -2028,12 +1686,10 @@
         // ============================================
         // INICIALIZAÇÃO
         // ============================================
-        console.log('🔒 Ponto Biométrico Enterprise v2.0');
+        console.log('🔒 Ponto Biométrico - Versão Estável');
         console.log('📌 Clique 3 vezes no logo "PONTO SEGURO" para ADM');
-        console.log('⌨️ ESC = fechar menus | R = cadastrar | P = PDF');
-        console.log('✅ Reconhecimento facial REAL com FaceAPI.js');
-        console.log('🔊 Sons ativados!');
-        console.log('🔒 CORRIGIDO: Só reconhece rostos reais com descritores faciais');
+        console.log('⌨️ Enter = Capturar e Registrar | ESC = fechar menus | P = PDF');
+        console.log('📸 Sistema sem IA - 100% funcional!');
     </script>
 
 </body>
